@@ -1,0 +1,36 @@
+﻿﻿@using System.Numerics
+<div style="width: 100%; height: 100%; padding: 0; margin: 0;"
+	 @onmouseover="@NotifyMouseOver"
+	 @onmousemove="@NotifyMouseMove"
+	 @onmousedown="@NotifyMouseDown"
+	 @onmouseup="@NotifyMouseUp"
+	 @onmouseout="@NotifyMouseOut">
+	<CascadingValue Value="@Provider" IsFixed="true">
+		@ChildContent
+	</CascadingValue>
+</div>
+
+@code {
+
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+
+	/// <summary>
+	/// The provider holds a reference to the latest MouseState. It can be passed in, in case you want
+	/// to use the state provider from the same component that contains the MouseEventLayer component.
+	/// Otherwise, you can retrieve it as a CascadingParameter().
+	/// </summary>
+	[Parameter()]
+	public MouseStateProvider Provider { get; set; }= new MouseStateProvider();
+
+
+
+	private void NotifyMouseOver(MouseEventArgs args) => Provider.NotifyMouseOver(args, this);
+	private void NotifyMouseMove(MouseEventArgs args) => Provider.NotifyMouseMove(args, this);
+	private void NotifyMouseDown(MouseEventArgs args) => Provider.NotifyMouseDown(args, this);
+	private void NotifyMouseUp(MouseEventArgs args) => Provider.NotifyMouseUp(args, this);
+	private void NotifyMouseOut(MouseEventArgs args) => Provider.NotifyMouseOut(args, this);
+
+
+}

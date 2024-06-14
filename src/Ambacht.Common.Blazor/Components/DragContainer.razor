@@ -1,0 +1,183 @@
+﻿@using System.Reactive.Subjects
+@using System.Reactive
+@using System.Reactive.Linq
+@implements IDisposable
+<MouseEventLayer Provider="_mouseStateProvider">
+	<div 
+		 @onmouseleave="@OnMouseLeave"
+	     @ontouchend="@OnTouchEnd" @ontouchend:preventDefault
+	     @ontouchcancel="@OnTouchCancel" @ontouchcancel:preventDefault
+	     @ontouchmove="@OnTouchMove" @ontouchmove:preventDefault
+	     style="touch-action: none; width: 100%; height: 100%; padding: 0; margin: 0">
+		<CascadingValue Value="this">
+			@ChildContent
+		</CascadingValue>
+	</div>
+</MouseEventLayer>
+@code {
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		_mouseStateProvider.OnMove().OnNextUntilAsync(OnMouseMove, _disposed);
+		_mouseStateProvider.OnButtonUp(MouseButton.Left).OnNextUntilAsync(OnMouseUp, _disposed);
+	}
+
+
+	private readonly MouseStateProvider _mouseStateProvider = new();
+
+
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+
+
+
+	#region Mouse
+
+
+	/// <summary>
+	/// This method is called from the draggable, so we know which component is being dragged
+	/// </summary>
+	/// <param name="draggable"></param>
+	/// <param name="args"></param>
+	/// <returns></returns>
+	public async Task OnMouseDown(DraggableComponent draggable, MouseEventArgs args)
+	{
+		_mouseStateProvider.NotifyMouseDown(args, draggable);
+		if (args.Button == 0)
+		{
+			await StartDrag(draggable, new DragArgs()
+			{
+				PixelPosition = GetPixelPosition(args)
+			});
+		}
+	} 
+
+	private async Task OnMouseMove(MousePosition position)
+	{
+		await OnDrag(CreateDragArgs(position, false));
+	}
+
+	private async Task OnMouseLeave() => await EndDrag(CreateDragArgs(_mouseStateProvider.Current.Position, true));
+
+	private DragArgs CreateDragArgs(MousePosition position, bool stationary)
+	{
+		var delta = stationary ? Vector2.Zero : position.Movement;
+		return new DragArgs()
+		{
+			PixelPosition = position.Offset,
+			PixelDelta = delta,
+			LocalPosition = position.Offset,
+			LocalDelta = delta
+		};
+	}
+
+	private async Task OnMouseUp() => await EndDrag(CreateDragArgs(_mouseStateProvider.Current.Position, true));
+
+
+    #endregion
+
+    #region Touch events
+
+    public async Task OnTouchStart(DraggableComponent draggable, TouchEventArgs e)
+    {
+        var active = e.ChangedTouches.First();
+        _activeTouchId = active.Identifier;
+        _lastTouchPos = GetPixelPosition(e);
+        await StartDrag(draggable, new DragArgs()
+        {
+			PixelPosition = GetPixelPosition(e)
+        });
+    }
+
+    private async Task OnTouchMove(TouchEventArgs e)
+    {
+        var active = e.ChangedTouches.SingleOrDefault(e => e.Identifier == _activeTouchId);
+        if (active != null)
+        {
+            var currentPos = GetPixelPosition(e);
+            var delta = currentPos - _lastTouchPos;
+            _lastTouchPos = currentPos;
+
+            await OnDrag(new DragArgs()
+            {
+				PixelPosition = currentPos,
+				PixelDelta = delta,
+				LocalPosition = currentPos,
+				LocalDelta = delta
+            });
+        }
+    }
+
+    private async Task OnTouchEnd(TouchEventArgs e) => await EndDrag(new DragArgs()
+    {
+		PixelPosition = GetPixelPosition(e)
+    });
+
+	private async Task OnTouchCancel(TouchEventArgs e)=> await EndDrag(new DragArgs()
+	{
+		PixelPosition = GetPixelPosition(e)
+	});
+
+
+    private long? _activeTouchId;
+    private Vector2 _lastTouchPos = Vector2.Zero;
+
+	private Vector2 GetPixelPosition(TouchEventArgs args)
+	{
+		var touch = args.ChangedTouches.First();
+		return new Vector2((float)touch.ClientX, (float)touch.ClientY);
+	}
+
+	private Vector2 GetPixelPosition(MouseEventArgs args)
+	{
+		return new Vector2((float)args.OffsetX, (float)args.OffsetY);
+	}
+
+
+    #endregion
+
+
+    #region Dragging
+
+
+    private async Task StartDrag(DraggableComponent draggable, DragArgs args)
+    {
+        _dragging = draggable;
+	    await _dragging.OnDragStarted(args);
+    }
+
+    private async Task OnDrag(DragArgs args)
+    {
+        if (_dragging != null)
+        {
+            if (args.PixelDelta.Length() > 0)
+            {
+                await _dragging.OnDragged(args);
+            }
+        }
+    }
+
+    private async Task EndDrag(DragArgs args)
+    {
+	    if (_dragging != null)
+	    {
+		    var dragging = _dragging;
+		    _dragging = null;
+			await dragging.OnDragEnded(args);
+	    }
+    }
+
+    private DraggableComponent _dragging = null;
+
+    #endregion
+
+    public void Dispose()
+    {
+	    _disposed.OnNext(Unit.Default);
+    }
+
+    private readonly ISubject<Unit> _disposed = new Subject<Unit>();
+
+}

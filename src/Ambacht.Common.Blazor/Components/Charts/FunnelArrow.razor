@@ -1,0 +1,19 @@
+﻿<path d="@GetPath()" fill="@Fill" />
+
+@code {
+	[CascadingParameter()]
+	public DrawArea Area { get; set; }
+
+	[Parameter()]
+	public string Fill { get; set; }
+
+	private string GetPath() =>
+		new PathBuilder()
+			.Move(Area.Transform(0, Area.Size.Y))
+			.Line(Area.Transform(Area.Size.X / 2, 0))
+			.Line(Area.Transform(Area.Size.X, Area.Size.Y))
+			.Close()
+			.Build();
+
+
+}

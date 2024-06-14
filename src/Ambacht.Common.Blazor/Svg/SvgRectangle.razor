@@ -1,0 +1,22 @@
+﻿<rect x="@Value.Left" y="@Value.Top" width="@Value.Width" height="@Value.Height" fill="@Fill" stroke="@Stroke" stroke-width="@StrokeWidth" @attributes="@Attributes" />
+
+
+@code {
+
+  [Parameter()]
+  public Rectangle<float> Value { get; set; }
+
+  [Parameter()]
+  public string Fill { get; set; } = "none";
+
+  [Parameter()]
+    public string Stroke { get; set; } = "#373737";
+
+  [Parameter()]
+  public string StrokeWidth { get; set; } = "1";
+
+  [Parameter(CaptureUnmatchedValues = true)]
+  public Dictionary<string, object> Attributes { get; set; }
+
+
+}

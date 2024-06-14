@@ -1,0 +1,152 @@
+﻿<SvgLayout>
+	<SvgGrid ColumnSizes="GetColumnSizes()" RowSizes="GetRowSizes()">
+		
+		
+		@foreach(var x in Enumerable.Range(0, Steps.Count))
+		{
+			@if (x > 0)
+			{
+				<SvgGridItem />
+			}
+			<SvgGridItem>
+				<!-- Arrow pointing up -->
+				<FunnelArrow Fill="@Steps[x].Fill" />
+			</SvgGridItem>
+		}
+
+
+		@foreach (var y in Enumerable.Range(0, Steps.Count))
+		{
+			@foreach (var x in Enumerable.Range(0, Steps.Count))
+			{
+				@if (x > 0)
+				{
+					<SvgGridItem>
+						@if (x < y)
+						{
+							<SvgFill Fill="@Steps[y].Fill" />
+						}
+					</SvgGridItem>
+				}
+				<SvgGridItem>
+					@if (x == y)
+					{
+						<!-- Bend arrow up -->
+					}
+					else if (x < y)
+					{
+						<!-- Arrow to the right -->
+						<SvgFill Fill="@Steps[y].Fill" />
+					}
+					else
+					{
+						<!-- Arrow up -->
+						<SvgFill Fill="@Steps[x].Fill" />
+					}
+				</SvgGridItem>
+				
+			}
+
+			@foreach(var x in Enumerable.Range(0, Steps.Count))
+			{
+				@if (x > 0)
+				{
+					<SvgGridItem />
+					
+				}
+				<SvgGridItem>
+					@if (x > y)
+					{
+						<!-- Arrow up -->
+						<SvgFill Fill="@Steps[x].Fill" />
+					}
+
+					
+				</SvgGridItem>
+			}
+		}
+		
+		@foreach(var x in Enumerable.Range(0, Steps.Count))
+		{
+			@if (x > 0)
+			{
+				<SvgGridItem />
+			}
+			<SvgGridItem>
+				<SvgText>@Steps[x].Name</SvgText>
+			</SvgGridItem>
+		}
+
+	</SvgGrid>
+</SvgLayout>
+
+@code {
+
+
+	[Parameter()]
+	public List<FunnelStep> Steps { get; set; } = new List<FunnelStep>();
+
+	[CascadingParameter()]
+	public DrawArea Area { get; set; }
+
+
+	private SvgLength[] GetColumnSizes()
+	{
+		if (Steps == null || Steps.Count == 0)
+		{
+			return new[] { SvgLength.Auto(), };
+		}
+		var result = new SvgLength[Steps.Count * 2 - 1];
+		for (var i = 0; i < Steps.Count; i++)
+		{
+			result[i * 2] = new SvgRelativeLength(Steps[i].Value);
+			if (i > 0)
+			{
+				result[i * 2 - 1] = new SvgPixelLength(HorizontalGutterWidth);
+			}
+		}
+		return result;
+	}
+
+
+	private SvgLength[] GetRowSizes()
+	{
+		if (Steps == null || Steps.Count == 0)
+		{
+			return new[] { SvgLength.Auto(), };
+		}
+		var result = new SvgLength[Steps.Count * 2 + 1];
+		for (var i = 0; i < Steps.Count; i++)
+		{
+			if (i == 0)
+			{
+				result[i * 2] = SvgLength.Px(TopArrowSpace);
+			}
+			else
+			{
+				result[i * 2] = SvgLength.Px(VerticalGutterWidth);
+			}
+			result[i * 2 + 1] = SvgLength.Relative(Steps[i].Value);
+		}
+		result[^1] = SvgLength.Px(StepLabelSize);
+		return result;
+	}
+
+	private const float HorizontalGutterWidth = 5f;
+	private const float VerticalGutterWidth = 3f;
+    private const float StepLabelSize = 100f;
+    private const float TopArrowSpace = 40f;
+
+
+	public class FunnelStep
+	{
+		public string Name { get; set; }
+		public string Fill { get; set; }
+		public float Value { get; set; }
+		public string FormattedValue { get; set; }
+
+		public string FormatValue() => FormattedValue ?? Value.ToString();
+
+	}
+
+}

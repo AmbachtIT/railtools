@@ -1,0 +1,76 @@
+﻿<SvgLine From="@Offset(P1)" To="@Offset(P2)" stroke="@Stroke" />
+<SvgText 
+  text-anchor="middle"
+  dominant-baseline="middle"
+  style="font-weight: bold; user-select: none;" 
+  transform="@LabelTransform"
+  stroke="#rgba(1, 1, 1, .5)"
+  fill="#373737">@ChildContent</SvgText>
+
+@foreach (var transform in GetAngleTransforms())
+{
+  <g transform="@transform">
+    <line y1="5" y2="-5" stroke="@Stroke" />
+    <line y2="5" x2="-10" stroke="@Stroke" />
+    <line y2="-5" x2="-10" stroke="@Stroke" />
+  </g>
+}
+
+@code {
+
+  [Parameter()]
+  public Vector2 P1 { get; set; }
+
+  
+
+  [Parameter()]
+  public Vector2 P2 { get; set; }
+
+  [Parameter()]
+  public float LabelOffset { get; set; } = 16;
+
+  [Parameter()]
+  public float ArrowOffset { get; set; } = 6;
+
+  private Vector2 Forward => P2 - P1;
+  private Vector2 ForwardUnit => Vector2.Normalize(Forward);
+  private Vector2 UpUnit => ForwardUnit.Rotate(MathF.PI / 2f);
+
+  [Parameter()]
+    public string Stroke { get; set; } = "#373737";
+
+  private Vector2 Offset(Vector2 v) => v + UpUnit * ArrowOffset;
+
+  [Parameter()]
+  public RenderFragment ChildContent { get; set; }
+
+  private string LabelTransform => new TransformBuilder()
+    .Translate(LabelPos)
+    .RotateRadians(Forward.Angle())
+    .Build();
+
+  private Vector2 LabelPos => P1 + Forward * 0.5f + UpUnit * LabelOffset;
+
+  private IEnumerable<string> GetAngleTransforms()
+  {
+    foreach (var (pos, angle) in Arrows())
+    {
+      yield return new TransformBuilder()
+        .Translate(pos)
+        .RotateRadians(angle + MathF.PI)
+        .Build();
+    }
+  }
+
+  private IEnumerable<(Vector2, float)> Arrows()
+  {
+    if (P1 == P2)
+    {
+      yield break;
+    }
+    yield return (Offset(P1), Forward.Angle());
+    yield return (Offset(P2), (-Forward).Angle());
+  }
+
+
+}

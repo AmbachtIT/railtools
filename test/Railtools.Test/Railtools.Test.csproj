@@ -17,4 +17,10 @@
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Ambacht.Common.Blazor\Ambacht.Common.Blazor.csproj" />
+    <ProjectReference Include="..\..\src\Ambacht.Common\Ambacht.Common.csproj" />
+    <ProjectReference Include="..\..\src\Railtools\Railtools.csproj" />
+  </ItemGroup>
+
 </Project>

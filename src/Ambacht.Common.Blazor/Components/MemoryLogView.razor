@@ -1,0 +1,23 @@
+﻿@using Ambacht.Common.Diagnostics
+@inherits AmbachtComponentBase
+@inject InMemoryLoggerProvider Provider
+
+<div class="w-100 font-mono">
+	@foreach (var entry in Provider)
+	{
+		<div>@entry.Name: @entry.Message</div>
+	}
+</div>
+
+@code {
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		Provider.OnNextUntil(_ =>
+		{
+			StateHasChanged();
+		}, Disposed);
+	}
+
+}

@@ -1,0 +1,36 @@
+﻿@using Microsoft.JSInterop
+@using Ambacht.Common.Blazor.Services
+@using System.Reactive.Subjects
+@inject IJSRuntime JSRuntime
+<CascadingValue TValue="IObservable<WindowState>" Value="@_state">
+	@ChildContent
+</CascadingValue>
+
+@code {
+
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+	private readonly ISubject<WindowState> _state = new Subject<WindowState>();
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+		if (!firstRender)
+		{
+			return;
+		}
+		await JSRuntime.InvokeVoidAsync("Ambacht.registerViewportChangeCallback", DotNetObjectReference.Create(this));
+	}
+
+	[JSInvokable()]
+	public void OnResize(int width, int height)
+	{
+		_state.OnNext(new WindowState()
+		{
+			Size = new Vector2(width, height)
+		});
+	}
+
+
+}
