@@ -26,17 +26,17 @@ namespace Railtools.Tracks.Library
 			this.Add(CreateStraight(mm));
 		}
 
-		private Straight CreateStraight(double mm) => new Straight()
+		private StraightType CreateStraight(double mm) => new StraightType()
 		{
 			Id = $"{Prefix}{Math.Round(mm):000}",
 			Name = $"Straight {mm:0.0}mm",
 			Length = mm,
 		};
 
-		private Curve CreateCurve(int radius, double angle)
+		private CurveType CreateCurve(int radius, double angle)
 		{
 			var mm = _radii[radius];
-			return new Curve()
+			return new CurveType()
 			{
 				Id = $"{Prefix}{radius}{Math.Round(angle):00}",
 				Name = $"Curve R{radius} {mm:0.0}mm {angle:0.0}\u00b0",

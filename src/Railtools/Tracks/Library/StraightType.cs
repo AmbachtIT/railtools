@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Railtools.Tracks.Library
 {
-	public record class Curve : SegmentType
+	public record class StraightType : SegmentType
 	{
 
 		/// <summary>
-		/// Radius in mm
+		/// Length in mm
 		/// </summary>
-		public double Radius { get; set; }
-
-		/// <summary>
-		/// Angle in degrees
-		/// </summary>
-		public double Angle { get; set; }
+		public double Length { get; set; }
 
 	}
 }
