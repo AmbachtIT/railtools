@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Railtools.Tracks.Library
+{
+	public record class Straight : SegmentType
+	{
+
+		/// <summary>
+		/// Length in mm
+		/// </summary>
+		public double Length { get; set; }
+
+	}
+}
