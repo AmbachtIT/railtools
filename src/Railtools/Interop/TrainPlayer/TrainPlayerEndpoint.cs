@@ -12,7 +12,7 @@ namespace Railtools.Interop.TrainPlayer
 	public class TrainPlayerEndpoint
 	{
 
-		[XmlAttribute()]
+		[XmlAttribute("nr")]
 		public int Nr { get; set; }
 
 		[XmlAttribute("coord")]

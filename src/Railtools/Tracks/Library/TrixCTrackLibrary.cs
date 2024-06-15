@@ -19,11 +19,29 @@ namespace Railtools.Tracks.Library
 			AddStraight(77.5);
 			AddStraight(70.8);
 			AddStraight(64.3);
+
+			AddCurve(1, 30);
+			AddCurve(1, 15);
+			AddCurve(1, 7.5);
+
+			AddCurve(2, 30);
+			AddCurve(2, 15);
+			AddCurve(2, 7.5);
+			AddCurve(2, 24.3);
+			AddCurve(2, 5.7);
+
+			AddCurve(3, 30);
+			AddCurve(3, 15);
+
+			AddCurve(4, 30);
+			AddCurve(5, 30);
+
+			AddCurve(9, 12.1);
 		}
 
-		private void AddStraight(double mm)
+		private void AddStraight(double length)
 		{
-			this.Add(CreateStraight(mm));
+			this.Add(CreateStraight(length));
 		}
 
 		private StraightType CreateStraight(double mm) => new StraightType()
@@ -32,6 +50,11 @@ namespace Railtools.Tracks.Library
 			Name = $"Straight {mm:0.0}mm",
 			Length = mm,
 		};
+
+		private void AddCurve(int radius, double angle)
+		{
+			this.Add(CreateCurve(radius, angle));
+		}
 
 		private CurveType CreateCurve(int radius, double angle)
 		{

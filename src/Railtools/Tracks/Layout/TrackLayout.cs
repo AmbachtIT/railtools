@@ -8,5 +8,9 @@ namespace Railtools.Tracks.Layout
 {
 	public class TrackLayout
 	{
+
+		public List<Section> Sections { get; set; } = new List<Section>();
+
+
 	}
 }

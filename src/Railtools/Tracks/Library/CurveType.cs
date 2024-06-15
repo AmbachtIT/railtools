@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Railtools.Tracks.Library
 {
-	public record class CurveType : SegmentType
+	public record class CurveType : SectionType
 	{
 
 		/// <summary>

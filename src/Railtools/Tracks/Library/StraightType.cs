@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Railtools.Tracks.Library
 {
-	public record class StraightType : SegmentType
+	public record class StraightType : SectionType
 	{
 
 		/// <summary>
