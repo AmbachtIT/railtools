@@ -1,0 +1,46 @@
+﻿@using Ambacht.Common.Blazor
+@inherits SlippyComponentBase
+<SlippyElement Center="@Position">
+	<text x="@_v.X" y="@_v.Y" class="text-xs font-bold">
+		@ChildContent
+	</text>
+</SlippyElement>
+
+@code {
+
+	protected override void OnInitialized()
+	{
+		_position.OnChangeUntil(_ => UpdateCoordinates(), Disposed);
+		_view.OnChangeUntil(_ => UpdateCoordinates(), Disposed);
+	}
+
+	[Parameter()]
+	public Coordinate Position
+	{
+		get => _position.Value;
+		set => _position.OnNext(value);
+	}
+
+	private BehaviorSubject<Coordinate> _position = new (null);
+
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+	private void UpdateCoordinates()
+	{
+		if (Position == null || View.Zoom == 0)
+		{
+			return;
+		}
+
+		OnDirty();
+		var newView = View with
+		{
+			Coords = Position.ToLatLng(Projection)
+		};
+		_v = newView.LatLngToView(Position.ToLatLng(Projection));
+	}
+
+	private Vector2<double> _v;
+
+}

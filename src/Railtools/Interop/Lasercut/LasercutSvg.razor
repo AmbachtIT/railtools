@@ -1,0 +1,27 @@
+﻿@using Railtools.Tracks.Layout
+@preservewhitespace true 
+<VectorMap @ref="@_map" FixedSize="new Vector2(1000, 1000)">
+	<desc>Line engraving</desc>
+	@foreach (var sect in Layout.Sections)
+	{
+		<TrackSectionLines Value="@sect"/>
+	}
+</VectorMap>
+
+@code {
+
+	[Parameter()] 
+	public TrackLayout Layout { get; set; } = new TrackLayout();
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+		if (firstRender)
+		{
+			await _map.Fit(Layout.Bounds(), true);
+		}
+	}
+
+	private VectorMap _map;
+
+}

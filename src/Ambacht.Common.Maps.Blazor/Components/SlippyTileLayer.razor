@@ -1,0 +1,84 @@
+﻿@preservewhitespace true
+<div class="map-layer">
+  @if (_set == null)
+  {
+    <span>No tile set selected</span>
+  }
+  else
+  {
+    foreach (var tile in _visibleTiles)
+    {
+      <img class="tile"
+           @key="tile.Key"
+           src="@tile.Image"
+           style="@tile.Style" />
+    }
+
+  }
+</div>
+
+<style>
+
+  img.tile {
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    user-select: none;
+    pointer-events: none;
+    touch-action: none;
+  }
+
+</style>
+
+@code {
+	private List<SlippyTileViewModel> _visibleTiles = new();
+
+
+	[Parameter()]
+	public SlippyTileSet Set
+	{
+		get => _set;
+		set
+		{
+			_set = value;
+			Update();
+		}
+	}
+
+	private SlippyTileSet _set;
+
+	[CascadingParameter()]
+	public SlippyMapView View
+	{
+		get => _view;
+		set
+		{
+			_view = value;
+			Update();
+		}
+	}
+
+	private SlippyMapView _view;
+	private bool _dirty = false;
+
+	private void Update()
+	{
+		if (_set == null)
+		{
+			return;
+		}
+		_visibleTiles = _set.GetVisibleTiles(View).ToList();
+		_dirty = true;
+	}
+
+	protected override bool ShouldRender()
+	{
+		if (!_dirty)
+		{
+			return false;
+		}
+		_dirty = false;
+		return true;
+	}
+
+}

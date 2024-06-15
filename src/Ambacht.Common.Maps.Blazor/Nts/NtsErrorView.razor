@@ -1,0 +1,54 @@
+﻿@using Ambacht.Common.Visualization
+<SlippyMap @ref="@_map">
+	@if (TileSet != null)
+	{
+		<SlippyTileLayer Set="@TileSet" />
+	}
+	<SlippyVectorLayer Projection="@Projection">
+		<ChildContent>
+			@if (Exception != null)
+			{
+				foreach (var kv in Exception.Geometries)
+				{
+					<SlippyPolygon Value="@kv.Value" Fill="@GetFill(kv.Key)" Stroke="#373737" StrokeWidth="1f" />
+				}
+
+				@if (Exception.Coordinate != null)
+				{
+					<SlippyMarker Center="@Exception.Coordinate" Radius="5" Fill="#990000" />
+				}
+			}
+				
+			
+
+		</ChildContent>
+	</SlippyVectorLayer>
+</SlippyMap>
+
+@code {
+
+	[Parameter()]
+	public Projection Projection { get; set; } = new RijksDriehoeksProjection();
+
+	[Parameter()]
+	public RobustNtsException Exception { get; set; }
+
+	[Parameter()]
+	public SlippyTileSet TileSet { get; set; }
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnParametersSetAsync();
+		if (Exception != null)
+		{
+			await _map.Fit(Exception.Geometries.Select(kv => kv.Value).GetBoundingRectangle(), Projection, 0.5f, true);
+		}
+	}
+
+
+	private string GetFill(string key) => _palette.GetColor(key); 
+	private readonly CategoryPalette<string> _palette = new(D3Palettes.Category20);
+	private SlippyMap _map;
+
+
+}

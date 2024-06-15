@@ -1,0 +1,255 @@
+﻿@using Ambacht.Common.Blazor
+@inherits AmbachtComponentBase
+@inject IGetSizeService GetSizeService
+
+<svg @ref="_container"
+     width="@FixedSize?.X"
+     height="@FixedSize?.Y"
+	 version="@Version"
+	 @onmousedown="OnMouseDown"
+	 @onmousemove="OnMouseMove"
+	 @onmouseup="OnMouseUp"
+	 @onmouseover="OnMouseOver"
+	 @onmouseout="OnMouseOut"
+	 @onmousewheel="OnMouseWheel"
+	 oncontextmenu="return false">
+	<CascadingValue Value="_view">
+		@ChildContent
+	</CascadingValue>
+</svg>
+
+@code {
+
+
+	[Parameter()]
+	public EventCallback<VectorMapView> OnViewChanged { get; set; }
+
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+	[Parameter()]
+	public string Class { get; set; }
+
+	[Parameter()]
+	public bool EnableMouseZoom { get; set; } = true;
+
+	[Parameter()]
+	public bool EnableMousePan { get; set; } = true;
+
+	[Parameter()]
+	public Vector2? FixedSize { get; set; }
+
+	[CascadingParameter()]
+	public IObservable<WindowState> WindowStates { get; set; }
+
+	[Parameter()]
+	public bool IsRootDocument { get; set; } = false;
+
+	private string Version => IsRootDocument ? "1.1" : null;
+
+	/// <summary>
+	/// Reference to the div container, used to retrieve the size
+	/// </summary>
+	private ElementReference _container;
+	private VectorMapView _view = new ()
+	{
+		Size = new Vector2(600, 600),
+		Center = new Vector2(300, 300),
+		Scale = 1
+	};
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		if (WindowStates != null)
+		{
+			WindowStates.OnChangeUntilAsync((_, _) => HandleResize(), Disposed);
+		}
+	}
+
+	private async Task HandleResize()
+	{
+		var size = FixedSize ?? await GetSizeService.GetSizeAsync(_container);
+		if (size.X <= 0 || size.Y <= 0)
+		{
+			return;
+		}
+
+		if (_lastSize != size)
+		{
+			_lastSize = size;
+		}
+
+		await SetView(_view with
+		{
+			Size = new Vector2(size.X, size.Y)
+		});
+	}
+
+	private Vector2 _lastSize = Vector2.Zero;
+
+	private async Task SetView(VectorMapView newView)
+	{
+		if (newView.Size.X <= 0 || newView.Size.Y <= 0)
+		{
+			return;
+		}
+
+		if (_deferredFit != null)
+		{
+			// Do we have a size yet?
+			var deferred = _deferredFit.Value;
+			_deferredFit = null;
+			newView = newView.Fit(deferred);
+		}
+		if (_trackedFit != null)
+		{
+			newView = newView.Fit(_trackedFit.Value);
+		}
+		if (_view.Equals(newView))
+		{
+			return;
+		}
+
+
+
+		var oldView = _view;
+		_view = newView;
+
+		if (oldView.Center != newView.Center)
+		{
+			//Center = newView.Coords;
+			//await CenterChanged.InvokeAsync(Center);
+		}
+
+		if (oldView.Scale != newView.Scale)
+		{
+			//ZoomAmount = newView.Zoom;
+			//await ZoomAmountChanged.InvokeAsync(ZoomAmount);
+		}
+		await OnViewChanged.InvokeAsync(_view);
+		this.StateHasChanged();
+	}
+
+
+
+	#region panning state
+
+	/// <summary>Pans the map</summary>
+	/// <remarks>Offset are in component pixel space, which has the same scale as tile pixel space</remarks>
+	public async Task Pan(Vector2 deltaPixels) => await SetView(_view.Pan(deltaPixels));
+
+	private bool _dragging = false;
+	private bool _over = false;
+	private Vector2<double> _previous;
+
+	private void OnMouseDown(MouseEventArgs args)
+	{
+		if (!EnableMousePan)
+		{
+			return;
+		}
+		if (args.Button == 0 && _over)
+		{
+			_dragging = true;
+			_previous = new Vector2<double>(args.ClientX, args.ClientY);
+		}
+	}
+
+	private void OnMouseUp(MouseEventArgs args)
+	{
+		if (args.Button == 0)
+		{
+			_dragging = false;
+		}
+	}
+
+	private async Task OnMouseMove(MouseEventArgs args)
+	{
+		if (args.Button == 0)
+		{
+			if (_dragging && _over)
+			{
+				var current = new Vector2<double>(args.ClientX, args.ClientY);
+				var delta = current - _previous;
+				_previous = current;
+				await Pan(delta.Cast<float>().ToVector2());
+			}
+		}
+	}
+
+	private void OnMouseOver(MouseEventArgs args)
+	{
+		_over = true;
+		_dragging = false;
+	}
+
+	private void OnMouseOut(MouseEventArgs args)
+	{
+		_over = false;
+		_dragging = false;
+	}
+
+	#endregion
+
+	#region Scrolling
+
+	public async Task Zoom(double deltaLevels, Vector2<double> pos)
+	{
+		await Task.CompletedTask;
+		/*
+		var newZoomAmount = (_view.Zoom + deltaLevels).Clamp(MinZoom, MaxZoom);
+		var center = SlippyMath.LatLngToPixel(_view.Coords, _view.Zoom, TileSize);
+		center -= _view.HalfSize;
+		center += pos;
+		await SetView(_view with
+			{
+				Coords = SlippyMath.PixelToLatLng(center, _view.Zoom, TileSize),
+				Zoom = newZoomAmount
+			});
+			*/
+	}
+
+
+	double _amountLeft = 0;
+	double _amountPerLevel = 100;
+
+	private async Task OnMouseWheel(WheelEventArgs args)
+	{
+		if (!EnableMouseZoom)
+		{
+			return;
+		}
+		_amountLeft -= args.DeltaY;
+		var levels = (int)(_amountLeft / _amountPerLevel);
+		_amountLeft -= levels * _amountPerLevel;
+		var current = new Vector2<double>(args.ClientX, args.ClientY);
+		await Zoom(levels, current);
+	}
+
+	#endregion
+
+	#region Fit
+
+	public async Task Fit(Rectangle<float> bounds, bool keepTracking)
+	{
+		if (keepTracking)
+		{
+			_trackedFit = bounds;
+		}
+
+		if (_view.Size.X <= 0 || _view.Size.Y <= 0)
+		{
+			_deferredFit = bounds;
+			return;
+		}
+
+		await SetView(_view.Fit(bounds));
+	}
+
+	private Rectangle<float>? _deferredFit = null;
+	private Rectangle<float>? _trackedFit = null;
+
+	#endregion
+
+}

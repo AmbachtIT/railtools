@@ -1,0 +1,139 @@
+﻿@implements IDisposable
+<SlippyElement Center="@_center">
+	<path d="@GetSvgPath()" fill="@Fill" fill-opacity="@Opacity" stroke="@Stroke" stroke-width="@StrokeWidth" style="@Style" onclick="@(() => OnClick.InvokeAsync())" class="@Class" />
+</SlippyElement>
+
+@code {
+
+	[Parameter()]
+	public Geometry Value
+	{
+		get => _value;
+		set
+		{
+			if (_value == value)
+			{
+				return;
+			}
+			_value = value;
+			_cachedSvgPath = null;
+			_center = value?.Centroid.Coordinate;
+			_dirty = true;
+			StateHasChanged();
+		}
+	}
+
+	private Geometry _value;
+	private Coordinate _center;
+
+	[Parameter()]
+	public string Fill { get; set; } = "#dbdbdb";
+
+	[Parameter()]
+	public string Stroke { get; set; } = "#373737";
+
+	[Parameter()]
+	public float Opacity { get; set; } = 1;
+
+	[Parameter()]
+	public float StrokeWidth
+	{
+		get => _StrokeWidth;
+		set
+		{
+			if (_StrokeWidth != value)
+			{
+				_StrokeWidth = value;
+				_dirty = true;
+			}
+		}
+	}
+
+	private float _StrokeWidth = 1f;
+
+	[Parameter()]
+	public string Class { get; set; }
+
+	[Parameter()]
+	public bool EnableMouseEvents
+	{
+		get => _EnableMouseEvents;
+		set
+		{
+			if (_EnableMouseEvents != value)
+			{
+				_EnableMouseEvents = value;
+				_dirty = true;
+				StateHasChanged();
+			}
+		}
+	}
+
+	private bool _EnableMouseEvents;
+
+	[Parameter()]
+	public EventCallback OnClick { get; set; }
+
+
+	[CascadingParameter()]
+	public VectorMapView View
+	{
+		get => _view;
+		set
+		{
+			if (_view.Scale == value.Scale && _view.Size == value.Size)
+			{
+				return;
+			}
+			_cachedSvgPath = null;
+			_dirty = true;
+			_view = value;
+		}
+	}
+
+	private VectorMapView _view;
+
+
+	private string Style => new CssStyleBuilder()
+		.Add("vector-effect", "non-scaling-stroke")
+		.Add("pointer-events", "none", !EnableMouseEvents)
+		.Add("cursor", "pointer", EnableMouseEvents)
+		.Build();
+
+	private string GetSvgPath()
+	{
+		if (Value == null || _center == null)
+		{
+			return null;
+		}
+		if (_cachedSvgPath == null)
+		{
+			var newView = View with
+			{
+				Center = _center?.ToVector2F() ?? default
+			};
+			_cachedSvgPath = Value.GetSvgPath(newView);
+		}
+		return _cachedSvgPath;
+	}
+
+	string _cachedSvgPath = null;
+
+	private bool _dirty = true;
+
+	public void Dispose()
+	{
+	}
+
+	protected override bool ShouldRender()
+	{
+		if (_dirty)
+		{
+			_dirty = false;
+			return true;
+		}
+
+		return false;
+	}
+
+}

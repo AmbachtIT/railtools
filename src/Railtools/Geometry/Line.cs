@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Ambacht.Common.Mathmatics;
 
 namespace Railtools.Geometry
 {
@@ -13,7 +14,19 @@ namespace Railtools.Geometry
 		{
 			this.Start = start;
 			this.End = end;
+
+			var delta = (end - start).ToVector2();
+			if (delta.LengthSquared() == 0)
+			{
+				_direction = 0;
+			}
+			else
+			{
+				_direction = delta.Angle();
+			}
 		}
+
+		private float _direction;
 
 		public Vector3 Start { get; }
 
@@ -24,5 +37,8 @@ namespace Railtools.Geometry
 		public Vector3 EndPosition() => End;
 
 		public float Length() => Vector3.Distance(Start, End);
+		public float GetDirection(float t) => _direction;
+
+		public Vector3 GetPoint(float t) => MathUtil.Lerp(Start, End, t);
 	}
 }

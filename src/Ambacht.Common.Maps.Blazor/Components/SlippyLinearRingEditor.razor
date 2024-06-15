@@ -1,0 +1,151 @@
+﻿@using Ambacht.Common.Blazor
+@inherits AmbachtComponentBase
+@if (Value != null)
+{
+	for (var i = 0; i < Value.Coordinates.Count; i++)
+	{
+		var c = i;
+		<SlippyMarker Center="@Value.Coordinates[i]" Radius="5" Fill="#ffffffff" Dragged="@(v => Dragged(c, v))" IsDraggable="true" MouseDown="@(async args => await RemoveVertex(c, args))" />
+	}
+	@if (_tentativeNewVertex != null)
+	{
+		<SlippyMarker Center="@_tentativeNewVertex" Radius="5" Fill="#ffffffff" IsDraggable="false" />
+	}
+}
+
+@code {
+
+	[Parameter()]
+	public NtsLinearRingEditor Value { get; set; }
+
+	[Parameter()]
+	public EventCallback OnUpdate { get; set; }
+
+	[CascadingParameter()]
+	public SlippyMapView View { get; set; }
+
+	[CascadingParameter()]
+	public Projection Projection { get; set; }
+
+
+	[CascadingParameter()]
+	public MouseStateProvider MouseStateProvider { get; set; } = new();
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		MouseStateProvider.OnMove().OnChangeUntil(OnMove, Disposed);
+		MouseStateProvider.OnButtonDown(MouseButton.Left).OnNextUntilAsync(AddVertex, Disposed);
+	}
+
+	private Coordinate _lastPosition;
+	private Coordinate _tentativeNewVertex;
+	private int _tentativeNewIndex;
+
+	private void OnMove(MousePosition position)
+	{
+		_lastPosition = ToWorld(position);
+		_tentativeNewVertex = GetTenantativeVertexCoordinates(position);
+	}
+
+	private async Task AddVertex()
+	{
+		if (_tentativeNewVertex == null)
+		{
+			return;
+		}
+		Value.Coordinates.Insert(_tentativeNewIndex, _tentativeNewVertex);
+		await OnUpdate.InvokeAsync();
+	}
+
+	private Coordinate GetTenantativeVertexCoordinates(MousePosition position)
+	{
+		if (Value.Coordinates.Count < 3)
+		{
+			return null;
+		}
+
+		var (index, segment) = GetClosestSegment(_lastPosition);
+		if (segment == null)
+		{
+			return null;
+		}
+
+		var treshold = 20 * View.MetersPerPixelF;
+		var closest = segment.ClosestPoint(_lastPosition);
+		if (closest == null || closest.Distance(_lastPosition) > treshold)
+		{
+			return null;
+		}
+
+		var endpointDistanceTreshold = 5 * View.MetersPerPixelF;
+		if (closest.Distance(segment.P0) <= endpointDistanceTreshold || closest.Distance(segment.P1) <= endpointDistanceTreshold)
+		{
+			return null;
+		}
+
+		_tentativeNewIndex = index;
+		return closest;
+	}
+
+
+	private Coordinate ToWorld(MousePosition position)
+	{
+		var pixelPosition = position.Offset;
+		var world = View.ViewToLatLng(pixelPosition.ToVector2D()).ToCoordinate(Projection);
+		return world;
+	}
+
+	private (int, LineSegment) GetClosestSegment(Coordinate coords) => GetSegments().MinBy(c => c.Item2.Distance(coords));
+
+	private IEnumerable<(int, LineSegment)> GetSegments()
+	{
+		var coords = Value.Coordinates;
+		if (coords.Count < 1)
+		{
+			yield break;
+		}
+		yield return (0, new LineSegment(coords[^1], coords[0]));
+		for (var i = 0; i < coords.Count - 1; i++)
+		{
+			yield return (i + 1, new LineSegment(coords[i], coords[i + 1]));
+		}
+	}
+
+	private int GetClosestVertex(Coordinate world)
+	{
+		var treshold = 5 * View.MetersPerPixelF;
+		for (var i = 0; i < Value.Coordinates.Count; i++)
+		{
+			if (world.Distance(Value.Coordinates[i]) < treshold)
+			{
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+
+
+
+	private async Task Dragged(int index, DragArgs args)
+	{
+		Value.Coordinates[index] = args.LocalPosition.ToCoordinate();
+		await OnUpdate.InvokeAsync();
+	}
+
+
+	private async Task RemoveVertex(int index, MouseEventArgs args)
+	{
+		if (args.Button == 2)
+		{
+			if (Value.Coordinates.Count > 3)
+			{
+				Value.Coordinates.RemoveAt(index);
+				await OnUpdate.InvokeAsync();
+			}
+		}
+	}
+
+}

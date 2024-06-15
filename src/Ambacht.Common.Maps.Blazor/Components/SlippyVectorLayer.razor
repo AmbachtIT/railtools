@@ -1,0 +1,32 @@
+﻿<svg width="100%" height="100%" class="map-layer">
+	@if (SvgDefs != null)
+	{
+		<defs>
+			@SvgDefs
+		</defs>
+	}
+	<CascadingValue Value="Projection">
+		<desc>
+			(Lat, Lng, Z): (@View.Coords.Latitude, @View.Coords.Longitude, @View.Zoom)
+		</desc>
+
+		@ChildContent
+	</CascadingValue>
+</svg>
+
+@code {
+
+  [Parameter()]
+  public RenderFragment SvgDefs { get; set; }
+
+  [Parameter()]
+  public RenderFragment ChildContent { get; set; }
+
+
+  [Parameter()]
+  public Projection Projection { get; set; }
+
+  [CascadingParameter()]
+  public SlippyMapView View { get; set; }
+
+}

@@ -1,0 +1,45 @@
+﻿<circle cx="@C.X" cy="@C.Y" r="@Radius" stroke="@Stroke" fill="@Fill" stroke-width="@StrokeWidth" @attributes="@Attributes" />
+
+@code {
+
+	private Vector2<double> C => View.LatLngToView(Center.ToLatLng(Projection));
+
+	[Parameter()]
+	public double Radius { get; set; }
+
+
+	[Parameter()]
+	public Coordinate Center { get; set; }
+
+	[Parameter()]
+	public string Fill { get; set; } = "#aaaaaa";
+
+	[Parameter()]
+	public string Stroke { get; set; } = "#373737";
+
+	[Parameter()]
+	public float StrokeWidth { get; set; } = 1f;
+
+	[CascadingParameter()]
+	public SlippyMapView View { get; set; }
+
+	[CascadingParameter()]
+	public Projection Projection { get; set; }
+
+	[Parameter(CaptureUnmatchedValues = true)]
+	public Dictionary<string, object> Attributes { get; set; }
+
+
+	private DirtyTracker _dirty = new();
+
+	protected override bool ShouldRender() => _dirty.ShouldRender(new
+	{
+		Radius,
+		Center,
+		Fill,
+		Stroke,
+		StrokeWidth,
+		View
+	});
+
+}

@@ -1,0 +1,19 @@
+﻿<SlippyLinearRingEditor Value="@Value.Shell" OnUpdate="@Update" />
+@foreach (var hole in Value.Holes)
+{
+	<SlippyLinearRingEditor Value="@hole" OnUpdate="@Update" />
+}
+
+@code {
+
+	[Parameter()]
+	public NtsPolygonEditor Value { get; set; }
+
+
+	[Parameter()]
+	public EventCallback OnUpdate { get; set; }
+
+
+	private async Task Update() => await OnUpdate.InvokeAsync();
+
+}

@@ -1,0 +1,15 @@
+﻿@using Railtools.Geometry
+@using Railtools.Tracks.Layout
+@inherits Ambacht.Common.Blazor.Components.PolymorphicChildComponent<SimpleSection>
+@if (Value != null)
+{
+	<VectorGeometry Value="@CreateGeometry()" Fill="none" Stroke="#ff0000" StrokeWidth="1" />
+}
+
+@code
+{
+	private Geometry CreateGeometry()
+	{
+		return Value.Trajectory.Buffer(16.5f / 2);
+	}
+}

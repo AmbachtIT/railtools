@@ -1,0 +1,55 @@
+﻿@using Ambacht.Common.Blazor
+@inherits SlippyComponentBase
+<SlippyElement Center="C1">
+	<line x1="@_v1.X" y1="@_v1.Y" x2="@_v2.X" y2="@_v2.Y" class="@Class" style="@Style" onclick="@(() => OnClick.InvokeAsync())" />
+</SlippyElement>
+
+@code {
+
+	protected override void OnInitialized()
+	{
+		_c1.OnChangeUntil(_ => UpdateCoordinates(), Disposed);
+		_c2.OnChangeUntil(_ => UpdateCoordinates(), Disposed);
+		_view.OnChangeUntil(_ => UpdateCoordinates(), Disposed);
+	}
+
+
+	[Parameter()]
+	public Coordinate C1
+	{
+		get => _c1.Value;
+		set => _c1.OnNext(value);
+	}
+	private BehaviorSubject<Coordinate> _c1 = new (null);
+
+
+	[Parameter()]
+	public Coordinate C2
+	{
+		get => _c2.Value;
+		set => _c2.OnNext(value);
+	}
+	private BehaviorSubject<Coordinate> _c2 = new (null);
+
+
+	private void UpdateCoordinates()
+	{
+		if (C1 == null || C2 == null || View.Zoom == 0)
+		{
+			return;
+		}
+
+		OnDirty();
+		var newView = View with
+		{
+			Coords = C1.ToLatLng(Projection)
+		};
+		_v1 = newView.LatLngToView(C1.ToLatLng(Projection));
+		_v2 = newView.LatLngToView(C2.ToLatLng(Projection));
+	}
+
+	private Vector2<double> _v1;
+	private Vector2<double> _v2;
+
+	
+}

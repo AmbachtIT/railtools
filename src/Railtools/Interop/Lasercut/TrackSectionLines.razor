@@ -1,0 +1,10 @@
+﻿@using Railtools.Tracks.Layout
+<PolymorphicParentComponent Value="@Value">
+	<TrackSectionSimpleLines />
+</PolymorphicParentComponent>
+
+@code
+{
+	[Parameter()]
+	public Section Value { get; set; }
+}

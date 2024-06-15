@@ -13,6 +13,18 @@ namespace Railtools.Geometry
 		Vector3 StartPosition();
 		Vector3 EndPosition();
 		float Length();
+		float GetDirection(float t);
 
+		Vector3 GetPoint(float t);
+
+
+	}
+
+	public static class TrajectoryExtensions
+	{
+		public static PointWithDirection GetPointWithDirection(this ITrajectory trajectory, float t) =>
+			new PointWithDirection(
+				trajectory.GetPoint(t),
+				trajectory.GetDirection(t));
 	}
 }

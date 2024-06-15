@@ -1,0 +1,85 @@
+﻿@inherits DraggableComponent
+@if (Center != null)
+{
+	<g transform="@Transform">
+		@if (ChildContent == null)
+		{
+			<circle r="@Radius" stroke="@Stroke" fill="@Fill" stroke-width="@StrokeWidth" />
+		}
+		else
+		{
+			@ChildContent
+		}
+		@if (IsDraggable)
+		{
+			@* This circle catches the mouse events, saves us from having to pass them on to the Child Content *@
+			<circle r="@Radius" stroke="none" fill-opacity="0"
+					@onmousedown="@OnMouseDown"
+					@onmousedown:preventDefault
+					@onmousedown:stopPropagation
+					@ontouchstart="@OnTouchStart" 
+					class="cursor-pointer" />
+		}
+	</g>
+}
+
+
+
+
+@code {
+
+	private Vector2<double> C => Center == null ? new Vector2<double>() : View.LatLngToView(Center.ToLatLng(Projection));
+
+	private string Transform =>
+		new TransformBuilder()
+			.Translate(C.Cast<float>().ToVector2())
+			.Build();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+	/// <summary>
+	/// The radius determines the radius of the circle element used to capture mouse events
+	/// </summary>
+	[Parameter()]
+	public double Radius { get; set; } = 10;
+
+	[Parameter()]
+	public Coordinate Center { get; set; }
+
+	[Parameter()]
+	public string Fill { get; set; } = "#dbdbdb";
+
+	[Parameter()]
+	public string Stroke { get; set; } = "#71D2CCff";
+
+	[Parameter()]
+	public float StrokeWidth { get; set; } = 1f;
+
+	[Parameter()]
+	public bool IsDraggable { get; set; } = false;
+
+	[CascadingParameter()]
+	public SlippyMapView View { get; set; }
+
+	[CascadingParameter()]
+	public Projection Projection { get; set; }
+
+
+	public override Task OnDragStarted(DragArgs args)
+	{
+		return base.OnDragStarted(_translator.HandleDragStarted(args, View, Projection));
+	}
+
+
+	public override Task OnDragged(DragArgs args)
+	{
+		return base.OnDragged(_translator.HandleDragged(args, View, Projection));
+	}
+
+	private readonly SlippyDragTranslator _translator = new SlippyDragTranslator();
+
+}

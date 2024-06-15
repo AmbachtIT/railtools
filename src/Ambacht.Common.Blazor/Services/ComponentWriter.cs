@@ -25,7 +25,7 @@ namespace Ambacht.Common.Blazor.Services
 		public async Task Export<TComponent>(string outputPath,
 			Action<ComponentRenderer<TComponent>> configureRenderer = null) where TComponent : ComponentBase
 		{
-			if (!outputPath.EndsWith(".html"))
+			if (!outputPath.EndsWith(".html") && !outputPath.EndsWith(".svg"))
 			{
 				throw new ArgumentException();
 			}

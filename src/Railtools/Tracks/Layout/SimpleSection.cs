@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ambacht.Common.Mathmatics;
 using Railtools.Geometry;
 using Railtools.Tracks.Library;
 
@@ -24,5 +25,13 @@ namespace Railtools.Tracks.Layout
 
 		public ITrajectory Trajectory { get; }
 
+		public override Rectangle<float> Bounds()
+		{
+			return RectangleUtil.Cover(new[]
+			{
+				Trajectory.StartPosition().ToVector2(),
+				Trajectory.EndPosition().ToVector2()
+			});
+		}
 	}
 }

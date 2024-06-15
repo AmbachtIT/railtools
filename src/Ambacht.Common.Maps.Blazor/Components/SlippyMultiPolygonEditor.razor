@@ -1,0 +1,20 @@
+﻿@if (Value != null)
+{
+	foreach (var poly in Value.Polygons)
+	{
+		<SlippyPolygonEditor Value="@poly" OnUpdate="@Update" />
+	}
+}
+
+@code {
+
+	[Parameter()]
+	public NtsMultiPolygonEditor Value { get; set; }
+
+	[Parameter()]
+	public EventCallback OnUpdate { get; set; }
+
+	private async Task Update() => await OnUpdate.InvokeAsync();
+
+
+}

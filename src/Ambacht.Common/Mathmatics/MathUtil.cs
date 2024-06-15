@@ -212,10 +212,22 @@ namespace Ambacht.Common.Mathmatics
             return from + (to - from) * alpha;
         }
 
-        /// <summary>
-        /// Reverse linear interpolation
-        /// </summary>
-        public static T ReverseLerp<T>(T from, T to, T value) where T: IFloatingPoint<T>
+        public static Vector2 Lerp(Vector2 from, Vector2 to, float alpha)
+        {
+	        return from + (to - from) * alpha;
+        }
+
+        public static Vector3 Lerp(Vector3 from, Vector3 to, float alpha)
+        {
+	        return from + (to - from) * alpha;
+        }
+
+
+
+		/// <summary>
+		/// Reverse linear interpolation
+		/// </summary>
+		public static T ReverseLerp<T>(T from, T to, T value) where T: IFloatingPoint<T>
         {
             if (to == from)
             {

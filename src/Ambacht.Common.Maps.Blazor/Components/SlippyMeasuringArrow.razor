@@ -1,0 +1,38 @@
+﻿<SvgMeasuringArrow P1="@Translate(P1)" P2="@Translate(P2)"
+                   LabelOffset="@LabelOffset" ArrowOffset="@ArrowOffset"
+                   Stroke="@Stroke">@ChildContent</SvgMeasuringArrow>
+
+@code {
+
+  [Parameter()]
+  public Coordinate P1 { get; set; }
+
+  [Parameter()]
+  public Coordinate P2 { get; set; }
+
+  [Parameter()]
+  public float LabelOffset { get; set; } = 16;
+
+  [Parameter()]
+  public float ArrowOffset { get; set; } = 6;
+
+  [Parameter()]
+    public string Stroke { get; set; } = "#373737";
+
+  [Parameter()]
+  public RenderFragment ChildContent { get; set; }
+
+  [CascadingParameter()]
+  public Projection Projection { get; set; }
+
+  [CascadingParameter()]
+  public SlippyMapView View { get; set; } = new();
+
+  private Vector2 Translate(Coordinate c) =>
+    View
+      .LatLngToView(Projection.Invert(c))
+      .Cast<float>()
+      .ToVector2();
+
+
+}

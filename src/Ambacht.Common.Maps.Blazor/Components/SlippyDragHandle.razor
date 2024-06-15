@@ -1,0 +1,76 @@
+﻿@inherits DraggableComponent
+<rect x="@Rect.Left" y="@Rect.Top" width="@Rect.Width" height="@Rect.Height" fill="white" stroke="black"
+      style="cursor: pointer;"
+      onmousedown="@OnMouseDown"
+      ontouchstart="@OnTouchStart" @ontouchstart:preventDefault />
+<text 
+  x="@Position.X" y="@Position.Y" 
+  text-anchor="middle" 
+  dominant-baseline="middle" 
+  cursor="move"
+  style="user-select: none; font-size: 1em; cursor: pointer; touch-action: none; font-weight: bold;"
+  onmousedown="@OnMouseDown"
+  ontouchstart="@OnTouchStart" @ontouchstart:preventDefault>@Glyph</text>
+
+
+@code {
+
+	[Parameter()]
+	public SvgDragDirection DragDirection { get; set; } = SvgDragDirection.Both;
+
+
+	/// <summary>
+	/// Offset, in pixels
+	/// </summary>
+	[Parameter()]
+	public Vector2<double> Offset { get; set; }
+
+	/// <summary>
+	/// Position in map coordinates
+	/// </summary>
+	[Parameter()]
+	public Coordinate Coordinate { get; set; }
+
+	/// <summary>
+	/// Position in screen coordinates
+	/// </summary>
+	private Vector2<double> Position => View.LatLngToView(Coordinate.ToLatLng(Projection)) + Offset;
+
+	private Rectangle<float> Rect => Rectangle<float>.Around(Position.Cast<float>(), 20);
+
+
+	[CascadingParameter()]
+	public SlippyMapView View { get; set; } = new();
+
+	[CascadingParameter()]
+	public Projection Projection { get; set; }
+
+
+
+	public override async Task OnDragged(DragArgs args)
+	{
+		await base.OnDragged(args with
+		{
+			LocalPosition = View.ViewToLatLng(args.LocalPosition.ToVector2D()).ToCoordinate(Projection).ToVector2().Cast<float>().ToVector2(),
+			LocalDelta = GetPixelDelta(args.PixelDelta) * View.MetersPerPixelF
+		});
+	}
+
+
+    private Vector2 GetPixelDelta(Vector2 v) => DragDirection switch
+    {
+        SvgDragDirection.Both => new (v.X, v.Y),
+        SvgDragDirection.Horizontal => new (v.X, 0f),
+        SvgDragDirection.Vertical => new (0f, v.Y),
+        _ => Vector2.Zero
+    };
+
+
+    private string Glyph => DragDirection switch
+    {
+        SvgDragDirection.Horizontal => "↔",
+        SvgDragDirection.Vertical => "↕",
+        SvgDragDirection.Both => "✥",
+        _ => "?"
+    };
+}

@@ -14,9 +14,9 @@ namespace Railtools.Geometry
 
 		public CircularArc(Vector2 center, float radius, float startAngle, float endAngle, float startHeight = 0, float endHeight = 0)
 		{
-			if (Math.Abs(startAngle - endAngle) > MathF.PI)
+			if (Math.Abs(startAngle - endAngle) >= MathF.PI)
 			{
-				throw new ArgumentException("Maximum angle for an arc is 180 degrees");
+				throw new ArgumentException("Arc angle must be less than 180 degrees");
 			}
 			this.Center = center;
 			this.Radius = radius;
@@ -68,5 +68,10 @@ namespace Railtools.Geometry
 		public Vector3 EndPosition() => AnglePosition(EndAngle);
 
 		public float Length() => Math.Abs(StartAngle - EndAngle) * Radius;
+		public float GetDirection(float t) => MathUtil.Lerp(StartAngle, EndAngle, t) - MathF.PI / 2f;
+
+		public Vector3 GetPoint(float t) => 
+			(MathUtil.UnitFromAngle(MathUtil.Lerp(StartAngle, EndAngle, t)) * Radius + Center)
+			.ToVector3(MathUtil.Lerp(StartHeight, EndHeight, t));
 	}
 }

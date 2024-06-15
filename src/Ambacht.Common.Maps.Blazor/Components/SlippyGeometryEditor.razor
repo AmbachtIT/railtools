@@ -1,0 +1,154 @@
+﻿@using Ambacht.Common.Blazor
+@inherits DraggableComponent
+@if (Value != null)
+{
+	if (IsEditable && IsEditing)
+	{
+		<SlippyElement Center="@_center">
+			<path d="@GetSvgPath()" fill="@Fill" stroke="@Stroke" stroke-width="@StrokeWidth" style="@Style" @onmousedown="@OnMouseDown" @onmousedown:preventDefault @onmousedown:stopPropagation @ontouchstart="@OnTouchStart" />
+		</SlippyElement>
+		<DynamicComponent Type="@GetComponentType()" Parameters="@GetParameters()" />
+	}
+	else
+	{
+		<SlippyPolygon Value="@Value" Fill="@Fill" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Class="@Class" OnClick="@OnClick" EnableMouseEvents="@IsEditable" />
+	}
+}
+
+@code {
+
+	[Parameter()]
+	public Geometry Value { get; set; }
+
+	[Parameter()]
+	public EventCallback<Geometry> ValueChanged { get; set; }
+
+	[Parameter()]
+	public bool IsEditable { get; set; }
+
+	[Parameter()]
+	public bool IsEditing
+	{
+		get => _editor != null;
+		set
+		{
+			if (value == IsEditing)
+			{
+				return;
+			}
+			if (value)
+			{
+				_editor = NtsGeometryEditor.Create(Value);
+				_center = Value.Centroid.Coordinate;
+			}
+			else
+			{
+				_cachedPath = null;
+				_editor = null;
+				_center = null;
+			}
+		}
+	}
+
+	private NtsGeometryEditor _editor;
+	private Coordinate _center;
+
+
+	[Parameter()]
+	public EventCallback OnClick { get; set; }
+
+	[Parameter()]
+	public string Fill { get; set; } = "#aaaaaa";
+
+	[Parameter()]
+	public string Stroke { get; set; } = "#373737";
+
+	[Parameter()]
+	public float StrokeWidth { get; set; }
+
+	[Parameter()]
+	public string Class { get; set; }
+
+	[CascadingParameter()]
+	public Projection Projection { get; set; }
+
+	[CascadingParameter()]
+	public SlippyMapView View { get; set; }
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		this.ObserveParameter(() => View).OnNextUntil(() => _cachedPath = null, Disposed);
+	}
+
+
+	private string Style => new CssStyleBuilder()
+		.Add("vector-effect", "non-scaling-stroke")
+		.Add("cursor", "pointer", true)
+		.Build();
+
+	private string GetSvgPath()
+	{
+		if (_editor == null || _center == null)
+		{
+			return null;
+		}
+
+		if (_cachedPath == null)
+		{
+			var newView = View with
+			{
+				Coords = _center.ToLatLng(Projection)
+			};
+			_cachedPath = _editor.CreateGeometry().GetSvgPath(newView, Projection);
+		}
+		return _cachedPath;
+	}
+
+	private string _cachedPath;
+
+	private Type GetComponentType() => _editor switch
+	{
+		NtsPolygonEditor _ => typeof(SlippyPolygonEditor),
+		NtsMultiPolygonEditor _ => typeof(SlippyMultiPolygonEditor),
+		NtsLinearRingEditor _ => typeof(SlippyLinearRingEditor),
+		_ => typeof(Empty),
+	};
+
+	private Dictionary<string, object> GetParameters() => new Dictionary<string, object>()
+	{
+		{ "Value", _editor },
+		{ "OnUpdate", EventCallback.Factory.Create(this, OnGeometryChanged) }
+	};
+
+	private async Task OnGeometryChanged()
+	{
+		_cachedPath = null;
+		Value = _editor.CreateGeometry();
+		await ValueChanged.InvokeAsync(Value);
+		StateHasChanged();
+	}
+
+
+	public override Task OnDragStarted(DragArgs args)
+	{
+		return base.OnDragStarted(_translator.HandleDragStarted(args, View, Projection));
+	}
+
+
+
+	public override async Task OnDragged(DragArgs args)
+	{
+		var newArgs = _translator.HandleDragged(args, View, Projection);
+		await base.OnDragged(newArgs);
+		if (_editor != null)
+		{
+			_editor.Translate(newArgs.LocalDelta);
+			await OnGeometryChanged();
+		}
+	}
+
+
+	private readonly SlippyDragTranslator _translator = new SlippyDragTranslator();
+
+}

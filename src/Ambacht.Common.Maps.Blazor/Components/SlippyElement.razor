@@ -1,0 +1,90 @@
+﻿<g transform="@GetTransform()">
+	@ChildContent
+</g>
+
+@code {
+
+	[Parameter()]
+	public Coordinate Center
+	{
+		get => _center;
+		set
+		{
+			if(object.Equals(_center, value))
+			{
+				return;
+			}
+
+			_center = value;
+			_transform = null;
+
+		}
+	}
+
+	private Coordinate _center;
+
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+	[CascadingParameter()]
+	public SlippyMapView View
+	{
+		get => _view;
+		set
+		{
+			if (object.Equals(_view, value))
+			{
+				return;
+			}
+
+			_transform = null;
+			_view = value;
+		}
+	}
+
+	private SlippyMapView _view;
+
+
+	[CascadingParameter()]
+	public Projection Projection
+	{
+		get => _projection;
+		set
+		{
+			if (_projection == value)
+			{
+				return;
+			}
+
+			_projection = value;
+			_transform = null;
+		}
+	}
+
+	private Projection _projection;
+
+	[CascadingParameter()]
+	public Func<Coordinate, Vector2<double>> ProjectionFunc { get; set; }
+
+	private string _transform;
+
+	private string GetTransform()
+	{
+		if (Center == null)
+		{
+			return null;
+		}
+
+		if (_transform == null)
+		{
+			_transform =
+				new SvgTransformBuilder()
+					.Translate(View.LatLngToView(Center.ToLatLng(Projection)) - View.LatLngToView(View.Coords))
+					.Build();
+		}
+
+		return _transform;
+	}
+
+
+}

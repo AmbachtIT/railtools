@@ -15,6 +15,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambacht.Common", "src\Ambac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambacht.Common.Blazor", "src\Ambacht.Common.Blazor\Ambacht.Common.Blazor.csproj", "{99E6D389-3B5D-434D-88E4-12C8817E0A0C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambacht.Common.Maps", "src\Ambacht.Common.Maps\Ambacht.Common.Maps.csproj", "{A3034F1F-AAA8-46F6-A549-504395774636}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambacht.Common.Maps.Blazor", "src\Ambacht.Common.Maps.Blazor\Ambacht.Common.Maps.Blazor.csproj", "{440DCBAD-CB6E-44CE-8838-B6348460157D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +41,14 @@ Global
 		{99E6D389-3B5D-434D-88E4-12C8817E0A0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99E6D389-3B5D-434D-88E4-12C8817E0A0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99E6D389-3B5D-434D-88E4-12C8817E0A0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3034F1F-AAA8-46F6-A549-504395774636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3034F1F-AAA8-46F6-A549-504395774636}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3034F1F-AAA8-46F6-A549-504395774636}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3034F1F-AAA8-46F6-A549-504395774636}.Release|Any CPU.Build.0 = Release|Any CPU
+		{440DCBAD-CB6E-44CE-8838-B6348460157D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{440DCBAD-CB6E-44CE-8838-B6348460157D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{440DCBAD-CB6E-44CE-8838-B6348460157D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{440DCBAD-CB6E-44CE-8838-B6348460157D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +58,8 @@ Global
 		{E409A180-1853-4EFA-83CB-7D1921FCB3CA} = {E97CA712-2ABD-41A8-987B-0A8A6E4BE180}
 		{39CBE350-879A-4F38-8092-9C3FA2BC7F5E} = {B650BADC-05B0-4986-B201-ECFE01FC8E45}
 		{99E6D389-3B5D-434D-88E4-12C8817E0A0C} = {B650BADC-05B0-4986-B201-ECFE01FC8E45}
+		{A3034F1F-AAA8-46F6-A549-504395774636} = {B650BADC-05B0-4986-B201-ECFE01FC8E45}
+		{440DCBAD-CB6E-44CE-8838-B6348460157D} = {B650BADC-05B0-4986-B201-ECFE01FC8E45}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A511B4FE-863E-4352-A5C6-44A6EFBD82C9}

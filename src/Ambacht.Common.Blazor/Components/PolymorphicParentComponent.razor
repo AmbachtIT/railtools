@@ -1,0 +1,17 @@
+﻿@typeparam T
+@implements IPolymorphicParentComponent
+<CascadingValue Value="@this">
+	@ChildContent
+</CascadingValue>
+
+@code {
+
+	[Parameter()]
+	public T Value { get; set; }
+
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+	public TValue GetValue<TValue>() where TValue: class => ((object) Value) as TValue;
+
+}
