@@ -58,7 +58,7 @@ namespace Railtools.Tracks.Library
 
 		private CurveType CreateCurve(int radius, double angle)
 		{
-			var mm = _radii[radius];
+			var mm = CTrack.GetRadius(radius);
 			return new CurveType()
 			{
 				Id = $"{Prefix}{radius}{Math.Round(angle):00}",
@@ -69,15 +69,6 @@ namespace Railtools.Tracks.Library
 		}
 
 
-		private static Dictionary<int, double> _radii = new Dictionary<int, double>()
-		{
-			{ 1, 360 },
-			{ 2, 437.5 },
-			{ 3, 515 },
-			{ 4, 579.3 },
-			{ 5, 643.6 },
-			{ 9, 1114.6 },
-		};
 
 		protected const string Prefix = "62";
 

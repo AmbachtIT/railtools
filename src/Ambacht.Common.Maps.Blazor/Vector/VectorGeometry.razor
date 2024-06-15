@@ -1,7 +1,7 @@
 ﻿@implements IDisposable
-<SlippyElement Center="@_center">
+<VectorElement Center="@_center">
 	<path d="@GetSvgPath()" fill="@Fill" fill-opacity="@Opacity" stroke="@Stroke" stroke-width="@StrokeWidth" style="@Style" onclick="@(() => OnClick.InvokeAsync())" class="@Class" />
-</SlippyElement>
+</VectorElement>
 
 @code {
 

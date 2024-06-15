@@ -17,6 +17,13 @@ namespace Railtools.Geometry
 
 		Vector3 GetPoint(float t);
 
+		/// <summary>
+		/// Returns the t closest to the specified position
+		/// </summary>
+		/// <param name="position"></param>
+		/// <returns></returns>
+		float Project(Vector3 position);
+
 
 	}
 

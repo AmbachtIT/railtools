@@ -23,9 +23,9 @@ namespace Ambacht.Common.Blazor.Svg
 			return this;
 		}
 
-		public SvgTransformBuilder Translate(double v) => Scale(v, v);
+		public SvgTransformBuilder Translate(double v) => Translate(v, v);
 
-		public SvgTransformBuilder Translate(Vector2 v) => Scale(v.X, v.Y);
+		public SvgTransformBuilder Translate(Vector2 v) => Translate(v.X, v.Y);
 
 		public SvgTransformBuilder Translate(Vector2<double> v) => Translate(v.X, v.Y);
 

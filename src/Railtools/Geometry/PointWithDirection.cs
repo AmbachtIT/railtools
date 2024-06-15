@@ -45,6 +45,13 @@ namespace Railtools.Geometry
 		public PointWithDirection Right(float amount) => Left(-amount);
 
 
+		public PointWithDirection Forward(float amount)
+		{
+			var delta = MathUtil.UnitFromAngle(Direction).ToVector3(0);
+			return new(Point + delta * amount, Direction);
+		}
+
+		public PointWithDirection Back(float amount) => Forward(-amount);
 
 	}
 }

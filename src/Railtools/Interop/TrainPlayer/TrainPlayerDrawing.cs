@@ -30,9 +30,12 @@ namespace Railtools.Interop.TrainPlayer
 	public class TrainPlayerArc : TrainPlayerDrawing
 	{
 		[XmlAttribute("direction")]
-		public double Direction { get; set; }
+		public float Direction { get; set; }
+
+		[XmlAttribute("angle")]
+		public float Angle { get; set; }
 
 		[XmlAttribute("radius")]
-		public double Radius { get; set; }
+		public float Radius { get; set; }
 	}
 }

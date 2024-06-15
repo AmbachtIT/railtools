@@ -50,7 +50,7 @@ namespace Railtools.Geometry
 		public float EndAngle { get; }
 
 		/// <summary>
-		/// End angle in radians
+		/// End height
 		/// </summary>
 		public float EndHeight { get; }
 
@@ -67,11 +67,18 @@ namespace Railtools.Geometry
 
 		public Vector3 EndPosition() => AnglePosition(EndAngle);
 
-		public float Length() => Math.Abs(StartAngle - EndAngle) * Radius;
+		public float Length() => Math.Abs(EndAngle - StartAngle) * Radius;
 		public float GetDirection(float t) => MathUtil.Lerp(StartAngle, EndAngle, t) - MathF.PI / 2f;
 
 		public Vector3 GetPoint(float t) => 
 			(MathUtil.UnitFromAngle(MathUtil.Lerp(StartAngle, EndAngle, t)) * Radius + Center)
 			.ToVector3(MathUtil.Lerp(StartHeight, EndHeight, t));
+
+		public float Project(Vector3 position)
+		{
+			var delta = position.ToVector2() - this.Center;
+			var angle = delta.Angle();
+			return MathUtil.ReverseLerp(StartAngle, EndAngle, angle);
+		}
 	}
 }

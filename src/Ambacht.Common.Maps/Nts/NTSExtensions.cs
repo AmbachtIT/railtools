@@ -336,7 +336,7 @@ namespace Ambacht.Common.Maps.Nts
 				}
 
 				builder.Append(' ');
-				builder.Write(coord.ToVector2F());
+				builder.Write(view.WorldToScreen(coord));
 			}
 
 			return builder.ToString();
@@ -346,7 +346,7 @@ namespace Ambacht.Common.Maps.Nts
 		{
 			var builder = new StringBuilder();
 			builder.Append("M");
-			builder.Write(point.Coordinate.ToVector2F());
+			builder.Write(view.WorldToScreen(point.Coordinate));
 			return builder.ToString();
 		}
 

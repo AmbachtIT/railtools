@@ -10,6 +10,8 @@ namespace Railtools.Tracks.Layout
 {
 	public abstract record class Section
 	{
+		public string Fill { get; set; } = "#ff0000";
+
 		public abstract Rectangle<float> Bounds();
 	}
 }

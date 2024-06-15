@@ -36,9 +36,13 @@ namespace Railtools.Geometry
 
 		public Vector3 EndPosition() => End;
 
-		public float Length() => Vector3.Distance(Start, End);
+		public float Length() => Vector2.Distance(Start.ToVector2(), End.ToVector2());
 		public float GetDirection(float t) => _direction;
 
 		public Vector3 GetPoint(float t) => MathUtil.Lerp(Start, End, t);
+		public float Project(Vector3 position)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

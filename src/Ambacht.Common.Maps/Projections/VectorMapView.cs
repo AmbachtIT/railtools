@@ -6,6 +6,8 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Ambacht.Common.Maps.Nts;
+using NetTopologySuite.Geometries;
 
 namespace Ambacht.Common.Maps.Projections
 {
@@ -28,6 +30,16 @@ namespace Ambacht.Common.Maps.Projections
 		/// Scale, in pixels per unit
 		/// </summary>
 		public float Scale { get; set; }
+
+		public Vector2 WorldToScreen(Coordinate coord)
+		{
+			var result = coord.ToVector2F();
+			result -= Center;
+			result *= Scale;
+			result += HalfSize;
+			return result;
+		}
+
 
 		public VectorMapView Pan(Vector2 deltaPixels)
 		{

@@ -3,7 +3,7 @@
 @inherits Ambacht.Common.Blazor.Components.PolymorphicChildComponent<SimpleSection>
 @if (Value != null)
 {
-	<VectorGeometry Value="@CreateGeometry()" Fill="none" Stroke="#ff0000" StrokeWidth="1" />
+	<VectorGeometry Value="@CreateGeometry()" Fill="none" Stroke="@Value.Fill" StrokeWidth="1" />
 }
 
 @code

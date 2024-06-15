@@ -15,29 +15,37 @@ namespace Railtools.Geometry
 		public static NetTopologySuite.Geometries.Geometry Buffer(this ITrajectory trajectory, float amount) =>
 			trajectory switch
 			{
-				Line line => Buffer(line, amount),
+				Line line => Buffer(line, amount, 1),
+				CircularArc arc => Buffer(arc, amount, (int)Math.Max(arc.Length() / 4f, 2)),
 				_ => throw new NotSupportedException()
 			};
 
-		public static NetTopologySuite.Geometries.LinearRing Buffer(this Line line, float amount)
+		private static NetTopologySuite.Geometries.LinearRing Buffer(this ITrajectory trajectory, float amount, int steps)
 		{
 			var builder = new NtsBuilder();
 
-			foreach (var extreme in BufferExtremesRing(amount))
+			foreach (var extreme in BufferExtremesRing(amount, steps))
 			{
-				builder.Add(line.GetPointWithDirection(extreme.X).Right(extreme.Y).Point.ToVector2());
+				builder.Add(trajectory.GetPointWithDirection(extreme.X).Right(extreme.Y).Point.ToVector2());
 			}
 
 			return builder.CreateLinearRing();
 		}
 
 
-		private static IEnumerable<Vector2> BufferExtremesRing(float amount)
+		private static IEnumerable<Vector2> BufferExtremesRing(float amount, int steps)
 		{
-			yield return new Vector2(0, amount);
-			yield return new Vector2(1, amount);
-			yield return new Vector2(1, -amount);
-			yield return new Vector2(0, -amount);
+			var stepSize = 1.0f / steps;
+			for (var i = 0; i<=steps; i++)
+			{
+				var alpha = (float)i / steps;
+				yield return new Vector2(alpha, amount);
+			}
+			for (var i = steps; i >= 0; i--)
+			{
+				var alpha = (float)i / steps;
+				yield return new Vector2(alpha, -amount);
+			}
 		}
 
 	}

@@ -19,7 +19,7 @@ namespace Railtools.Interop.TrainPlayer
 		public string Coord { get; set; }
 
 		[XmlAttribute("direction")]
-		public double Direction { get; set; }
+		public float Direction { get; set; }
 
 	}
 }

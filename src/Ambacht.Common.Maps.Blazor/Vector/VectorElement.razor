@@ -1,0 +1,68 @@
+﻿<g transform="@GetTransform()">
+	@ChildContent
+</g>
+
+@code {
+
+	[Parameter()]
+	public Coordinate Center
+	{
+		get => _center;
+		set
+		{
+			if(object.Equals(_center, value))
+			{
+				return;
+			}
+
+			_center = value;
+			_transform = null;
+
+		}
+	}
+
+	private Coordinate _center;
+
+	[Parameter()]
+	public RenderFragment ChildContent { get; set; }
+
+	[CascadingParameter()]
+	public VectorMapView View
+	{
+		get => _view;
+		set
+		{
+			if (object.Equals(_view, value))
+			{
+				return;
+			}
+
+			_transform = null;
+			_view = value;
+		}
+	}
+
+	private VectorMapView _view;
+
+	private string _transform;
+
+	private string GetTransform()
+	{
+		if (Center == null)
+		{
+			return null;
+		}
+
+		if (_transform == null)
+		{
+			_transform =
+				new SvgTransformBuilder()
+					.Translate(View.WorldToScreen(Center))
+					.Build();
+		}
+
+		return _transform;
+	}
+
+
+}
