@@ -63,24 +63,11 @@ namespace Railtools.Interop.TrainPlayer
 			var y = float.Parse(parts[1]);
 			var z = float.Parse(parts[2]);
 			return new Vector3(
-				(float)Math.Round(x * layout.ScaleX, 1), 
-				(float)Math.Round(y * layout.ScaleY, 1),
+				(float)Math.Round(x * layout.ScaleX * 10, 1), 
+				(float)Math.Round(y * layout.ScaleY * 10, 1),
 				(float)Math.Round(z * 40.2204 * layout.ScaleX, 1));
 		}
 
 
-
-		private Vector2 CoordsToVector2(string coords)
-		{
-			var parts = coords.Split(',');
-			if (parts.Length != 2)
-			{
-				throw new InvalidOperationException();
-			}
-
-			var x = float.Parse(parts[0]);
-			var y = float.Parse(parts[1]);
-			return new Vector2((float)Math.Round(x * layout.ScaleX, 1), (float)Math.Round(y * layout.ScaleY, 1));
-		}
 	}
 }
