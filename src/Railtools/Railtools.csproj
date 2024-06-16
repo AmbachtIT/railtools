@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Ambacht.Common\Ambacht.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interop\Vector\" />
+  </ItemGroup>
+
 </Project>

@@ -55,8 +55,9 @@ namespace Railtools.Interop.TrainPlayer
 			return CreateCurves(part, arc)
 				.MaxBy(s =>
 				{
-					var t = s.Trajectory.Project(startPosition);
-					var actualDirection = MathUtil.UnitFromAngle(s.Trajectory.GetPointWithDirection(t).Direction);
+					var trajectory = s.Trajectories[0];
+					var t = trajectory.Project(startPosition);
+					var actualDirection = MathUtil.UnitFromAngle(trajectory.GetPointWithDirection(t).Direction);
 					return Math.Abs(Vector2.Dot(startDirection, actualDirection));
 				})!;
 		}

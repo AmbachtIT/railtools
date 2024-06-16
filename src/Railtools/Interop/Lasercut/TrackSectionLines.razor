@@ -1,14 +1,18 @@
 ﻿@using Railtools.Geometry
 @using Railtools.Tracks.Layout
-<VectorGeometry Value="@CreateGeometry()" Fill="none" Stroke="@Value.Fill" StrokeWidth="1" />
+@foreach (var trajectory in Value.Trajectories)
+{
+	<VectorGeometry Value="@CreateGeometry(trajectory)" Fill="none" Stroke="@Value.Fill" StrokeWidth="1" />
+}
+
 
 @code
 {
 	[Parameter()]
 	public Section Value { get; set; }
 
-	private Geometry CreateGeometry()
+	private Geometry CreateGeometry(ITrajectory trajectory)
 	{
-		return Value.Trajectory.Buffer(Value.Gauge / 2);
+		return trajectory.Buffer(Value.Gauge / 2);
 	}
 }

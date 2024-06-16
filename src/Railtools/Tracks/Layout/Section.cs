@@ -14,7 +14,7 @@ namespace Railtools.Tracks.Layout
 	{
 		public Section(ITrajectory trajectory)
 		{
-			this.Trajectory = trajectory;
+			this.Trajectories = new [] { trajectory };
 		}
 
 
@@ -28,8 +28,8 @@ namespace Railtools.Tracks.Layout
 
 		public SectionType? Type { get; set; }
 
-		public ITrajectory Trajectory { get; }
+		public ITrajectory[] Trajectories { get; }
 
-		public Rectangle<float> Bounds() => Trajectory.Bounds();
+		public Rectangle<float> Bounds() => RectangleUtil.Cover(Trajectories.Select(t => t.Bounds()));
 	}
 }
