@@ -1,5 +1,5 @@
 ﻿@using Railtools.Geometry
-@using Railtools.Tracks.Layout
+@using Railtools.Tracks.Layouts
 @foreach (var trajectory in Value.Trajectories)
 {
 	<VectorGeometry Value="@CreateGeometry(trajectory)" Fill="none" Stroke="@Value.Fill" StrokeWidth="1" />

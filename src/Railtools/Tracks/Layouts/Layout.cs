@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Mathmatics;
 
-namespace Railtools.Tracks.Layout
+namespace Railtools.Tracks.Layouts
 {
-	public class TrackLayout
+	public class Layout
 	{
 
 		public List<Section> Sections { get; set; } = new List<Section>();

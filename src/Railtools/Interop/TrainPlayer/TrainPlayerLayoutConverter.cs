@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Mathmatics;
 using Railtools.Geometry;
-using Railtools.Tracks.Layout;
+using Railtools.Tracks.Layouts;
 using Railtools.Tracks.Library;
 
 namespace Railtools.Interop.TrainPlayer
@@ -19,9 +19,9 @@ namespace Railtools.Interop.TrainPlayer
 		private readonly Dictionary<int, TrainPlayerEndpoint> _endpoints = layout.Endpoints.ToDictionary(e => e.Nr);
 
 
-		public TrackLayout Convert()
+		public Layout Convert()
 		{
-			var result = new TrackLayout();
+			var result = new Layout();
 			foreach (var part in layout.Parts)
 			{
 				foreach (var section in CreateSections(part))

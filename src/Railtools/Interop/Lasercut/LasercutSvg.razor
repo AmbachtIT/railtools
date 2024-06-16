@@ -1,4 +1,4 @@
-﻿@using Railtools.Tracks.Layout
+﻿@using Railtools.Tracks.Layouts
 @preservewhitespace true 
 <VectorMap @ref="@_map" FixedSize="new Vector2(1000, 1000)">
 	<desc>Line engraving</desc>
@@ -11,7 +11,7 @@
 @code {
 
 	[Parameter()] 
-	public TrackLayout Layout { get; set; } = new TrackLayout();
+	public Layout Layout { get; set; } = new Layout();
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{

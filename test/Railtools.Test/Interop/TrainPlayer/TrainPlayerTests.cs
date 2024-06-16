@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Railtools.Interop.TrainPlayer;
-using Railtools.Tracks.Layout;
+using Railtools.Tracks.Layouts;
 
 namespace Railtools.Test.Interop.TrainPlayer
 {
@@ -38,11 +38,11 @@ namespace Railtools.Test.Interop.TrainPlayer
 		public void ConvertFile()
 		{
 			var result = ConvertSampleLayout();
-			Assert.That(result.Sections.Count, Is.EqualTo(138));
+			Assert.That(result.Sections.Count, Is.EqualTo(291));
 		}
 
 
-		public static TrackLayout ConvertSampleLayout()
+		public static Layout ConvertSampleLayout()
 		{
 			return new TrainPlayerLayoutConverter(ReadSampleLayout()).Convert();
 		}

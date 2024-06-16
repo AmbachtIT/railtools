@@ -10,7 +10,7 @@ using Ambacht.Common.Diagnostics;
 using Railtools.Geometry;
 using Railtools.Interop.Lasercut;
 using Railtools.Test.Interop.TrainPlayer;
-using Railtools.Tracks.Layout;
+using Railtools.Tracks.Layouts;
 using Railtools.Tracks.Library;
 
 namespace Railtools.Test.Interop.Lasercut
@@ -37,7 +37,7 @@ namespace Railtools.Test.Interop.Lasercut
 		public async Task RenderSimple()
 		{
 			await using var provider = TestHelper.CreateEmptyProvider();
-			var layout = new TrackLayout();
+			var layout = new Layout();
 			foreach (var piece in Spiral())
 			{
 				layout.Sections.Add(new Section(piece));

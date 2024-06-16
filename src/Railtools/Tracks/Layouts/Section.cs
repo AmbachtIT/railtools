@@ -8,7 +8,7 @@ using Ambacht.Common.Mathmatics;
 using Railtools.Geometry;
 using Railtools.Tracks.Library;
 
-namespace Railtools.Tracks.Layout
+namespace Railtools.Tracks.Layouts
 {
 	public record class Section
 	{
