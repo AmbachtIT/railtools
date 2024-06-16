@@ -33,19 +33,15 @@ namespace Railtools.Interop.Vector
 			return new AttributesTable();
 		}
 
-		private NetTopologySuite.Geometries.Geometry? CreateGeometry(Section section) => section switch
+
+
+		private NetTopologySuite.Geometries.Geometry? CreateGeometry(Section section) => section.Trajectory switch
 		{
-			SimpleSection simple => CreateGeometry(simple),
+			Line line => CreateGeometry(section, line),
 			_ => null
 		};
 
-		private NetTopologySuite.Geometries.Geometry? CreateGeometry(SimpleSection simple) => simple.Trajectory switch
-		{
-			Line line => CreateGeometry(simple, line),
-			_ => null
-		};
-
-		private NetTopologySuite.Geometries.Geometry CreateGeometry(SimpleSection simple, Line line)
+		private NetTopologySuite.Geometries.Geometry CreateGeometry(Section section, Line line)
 		{
 			return line.Buffer(16.5f);
 		}

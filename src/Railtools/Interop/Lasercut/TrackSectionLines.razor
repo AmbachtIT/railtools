@@ -1,10 +1,14 @@
-﻿@using Railtools.Tracks.Layout
-<PolymorphicParentComponent Value="@Value">
-	<TrackSectionSimpleLines />
-</PolymorphicParentComponent>
+﻿@using Railtools.Geometry
+@using Railtools.Tracks.Layout
+<VectorGeometry Value="@CreateGeometry()" Fill="none" Stroke="@Value.Fill" StrokeWidth="1" />
 
 @code
 {
 	[Parameter()]
 	public Section Value { get; set; }
+
+	private Geometry CreateGeometry()
+	{
+		return Value.Trajectory.Buffer(Value.Gauge / 2);
+	}
 }

@@ -40,7 +40,7 @@ namespace Railtools.Test.Interop.Lasercut
 			var layout = new TrackLayout();
 			foreach (var piece in Spiral())
 			{
-				layout.Sections.Add(new SimpleSection(piece));
+				layout.Sections.Add(new Section(piece));
 			}
 
 			var writer = new ComponentWriter(provider);

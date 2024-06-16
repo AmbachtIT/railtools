@@ -43,7 +43,7 @@ namespace Railtools.Interop.TrainPlayer
 		private Section CreateStraight(TrainPlayerPart part)
 		{
 			var trajectory = CreateLine(part);
-			return new SimpleSection(trajectory);
+			return new Section(trajectory);
 		}
 
 		private Section CreateCurve(TrainPlayerPart part)
@@ -61,13 +61,13 @@ namespace Railtools.Interop.TrainPlayer
 				})!;
 		}
 
-		private IEnumerable<SimpleSection> CreateDebugCurves(TrainPlayerPart part)
+		private IEnumerable<Section> CreateDebugCurves(TrainPlayerPart part)
 		{
 			var arc = part.Drawings.Cast<TrainPlayerArc>().Single();
 			return CreateCurves(part, arc);
 		}
 
-		private IEnumerable<SimpleSection> CreateCurves(TrainPlayerPart part, TrainPlayerArc arc)
+		private IEnumerable<Section> CreateCurves(TrainPlayerPart part, TrainPlayerArc arc)
 		{
 			var line = CreateLine(part);
 
@@ -87,7 +87,7 @@ namespace Railtools.Interop.TrainPlayer
 				var a1 = c1.Direction + pi - halfAngle;
 				var a2 = c1.Direction + pi + halfAngle;
 
-				yield return new SimpleSection(new CircularArc(c1.Point.ToVector2(), r, a1, a2, line.Start.Z, line.End.Z));
+				yield return new Section(new CircularArc(c1.Point.ToVector2(), r, a1, a2, line.Start.Z, line.End.Z));
 			}
 
 		}
