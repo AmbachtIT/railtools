@@ -48,66 +48,21 @@ namespace Railtools.Interop.TrainPlayer
 
 		private Section CreateCurve(TrainPlayerPart part)
 		{
-			var arc = part.Drawings.Cast<TrainPlayerArc>().Single();
-			var startPoint = _endpoints[part.EndpointNrs[0]];
-			var endPoint = _endpoints[part.EndpointNrs[1]];
+			return CreateCurve(part.Drawings.Cast<TrainPlayerArc>().Single());
+		}
+
+		private Section CreateCurve(TrainPlayerArc arc)
+		{
+			var start = CoordsToVector3(arc.Point1);
+			var end = CoordsToVector3(arc.Point2);
 			return new Section(CircularArc.Create(
-				CoordsToVector3(startPoint.Coord),
-				MathUtil.DegreesToRadiansF(90 - startPoint.Direction),
-				CoordsToVector3(endPoint.Coord),
+				start,
+				MathUtil.DegreesToRadiansF(90 - arc.Direction),
+				end,
 				ToMMX(arc.Radius),
 				MathUtil.DegreesToRadiansF(arc.Angle)
 			));
 		}
-
-
-		private Section CreateCurve2(TrainPlayerPart part)
-		{
-			var arc = part.Drawings.Cast<TrainPlayerArc>().Single();
-			var start = _endpoints[part.EndpointNrs[0]];
-			var startPosition = CoordsToVector3(start.Coord);
-			var startDirection = MathUtil.UnitFromAngle(MathUtil.DegreesToRadiansF(90 - start.Direction));
-			return CreateCurves(part, arc)
-				.MaxBy(s =>
-				{
-					var trajectory = s.Trajectories[0];
-					var t = trajectory.Project(startPosition);
-					var actualDirection = MathUtil.UnitFromAngle(trajectory.GetPointWithDirection(t).Direction);
-					return Math.Abs(Vector2.Dot(startDirection, actualDirection));
-				})!;
-		}
-
-		private IEnumerable<Section> CreateDebugCurves(TrainPlayerPart part)
-		{
-			var arc = part.Drawings.Cast<TrainPlayerArc>().Single();
-			return CreateCurves(part, arc);
-		}
-
-		private IEnumerable<Section> CreateCurves(TrainPlayerPart part, TrainPlayerArc arc)
-		{
-			var line = CreateLine(part);
-
-			var r = ToMMX(arc.Radius);
-			var d = line.Length() / 2f;
-			var l = MathF.Sqrt(r * r - d * d);
-
-
-			foreach (var dir in new[] { 1, -1 })
-			{
-				var pi = dir * MathF.PI / 2;
-
-
-				var c1 = line.GetPointWithDirection(0).Right(l * dir).Forward(d);
-				var halfAngle = (float)MathUtil.DegreesToRadians(arc.Angle) / 2;
-
-				var a1 = c1.Direction + pi - halfAngle;
-				var a2 = c1.Direction + pi + halfAngle;
-
-				yield return new Section(new CircularArc(c1.Point.ToVector2(), r, a1, a2, line.Start.Z, line.End.Z));
-			}
-
-		}
-
 
 		private string RandomColor()
 		{
