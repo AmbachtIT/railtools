@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,7 +35,7 @@ namespace Railtools.Interop.TrainPlayer
 
 		private IEnumerable<Section> CreateSections(TrainPlayerPart part) => part.Type switch
 		{
-			"Curve" => new [] { CreateCurve(part) } ,
+			"Curve" => new[] { CreateCurve(part) }, 
 			"Straight" => new [] { CreateStraight(part) },
 			_ => Array.Empty<Section>()
 		};
@@ -49,7 +51,7 @@ namespace Railtools.Interop.TrainPlayer
 			var arc = part.Drawings.Cast<TrainPlayerArc>().Single();
 			var start = _endpoints[part.EndpointNrs[0]];
 			var startPosition = CoordsToVector3(start.Coord);
-			var startDirection = MathUtil.UnitFromAngle(MathUtil.DegreesToRadiansF(start.Direction));
+			var startDirection = MathUtil.UnitFromAngle(MathUtil.DegreesToRadiansF(90 - start.Direction));
 			return CreateCurves(part, arc)
 				.MaxBy(s =>
 				{
@@ -59,25 +61,20 @@ namespace Railtools.Interop.TrainPlayer
 				})!;
 		}
 
+		private IEnumerable<SimpleSection> CreateDebugCurves(TrainPlayerPart part)
+		{
+			var arc = part.Drawings.Cast<TrainPlayerArc>().Single();
+			return CreateCurves(part, arc);
+		}
+
 		private IEnumerable<SimpleSection> CreateCurves(TrainPlayerPart part, TrainPlayerArc arc)
 		{
 			var line = CreateLine(part);
-
-			if (arc.Angle != 15)
-			{
-				//yield break;
-			}
-
-			if (part.Id % 10 != 0)
-			{
-				//yield break;
-			}
 
 			var r = ToMMX(arc.Radius);
 			var d = line.Length() / 2f;
 			var l = MathF.Sqrt(r * r - d * d);
 
-			var color = RandomColor();
 
 			foreach (var dir in new[] { 1, -1 })
 			{
@@ -90,10 +87,7 @@ namespace Railtools.Interop.TrainPlayer
 				var a1 = c1.Direction + pi - halfAngle;
 				var a2 = c1.Direction + pi + halfAngle;
 
-				yield return new SimpleSection(new CircularArc(c1.Point.ToVector2(), r, a1, a2, line.Start.Z, line.End.Z))
-				{
-					Fill = color
-				};
+				yield return new SimpleSection(new CircularArc(c1.Point.ToVector2(), r, a1, a2, line.Start.Z, line.End.Z));
 			}
 
 		}
@@ -116,14 +110,14 @@ namespace Railtools.Interop.TrainPlayer
 		private Vector3 CoordsToVector3(string coords)
 		{
 			var parts = coords.Split(',');
-			if (parts.Length != 3)
+			if (parts.Length < 2 || parts.Length > 3)
 			{
 				throw new InvalidOperationException();
 			}
 
 			var x = float.Parse(parts[0]);
 			var y = float.Parse(parts[1]);
-			var z = float.Parse(parts[2]);
+			var z = parts.Length > 2 ? float.Parse(parts[2]) : 0f;
 			return new Vector3(
 				(float)Math.Round(ToMMX(x), 1), 
 				(float)Math.Round(ToMMY(y), 1),

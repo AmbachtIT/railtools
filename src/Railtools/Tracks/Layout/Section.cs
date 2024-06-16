@@ -12,6 +12,11 @@ namespace Railtools.Tracks.Layout
 	{
 		public string Fill { get; set; } = "#ff0000";
 
+		/// <summary>
+		/// Gauge in mm
+		/// </summary>
+		public float Gauge { get; set; } = 16.5f;
+
 		public abstract Rectangle<float> Bounds();
 	}
 }
