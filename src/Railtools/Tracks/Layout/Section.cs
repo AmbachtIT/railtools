@@ -17,6 +17,10 @@ namespace Railtools.Tracks.Layout
 			this.Trajectories = new [] { trajectory };
 		}
 
+		public Section(IEnumerable<ITrajectory> trajectories)
+		{
+			this.Trajectories = trajectories.ToArray();
+		}
 
 		public string Fill { get; set; } = "#ff0000";
 

@@ -16,7 +16,7 @@ namespace Railtools.Interop.TrainPlayer
 	public class TrainPlayerLayoutConverter(TrainPlayerLayout layout)
 	{
 
-		private Dictionary<int, TrainPlayerEndpoint> _endpoints = layout.Endpoints.ToDictionary(e => e.Nr);
+		private readonly Dictionary<int, TrainPlayerEndpoint> _endpoints = layout.Endpoints.ToDictionary(e => e.Nr);
 
 
 		public TrackLayout Convert()
@@ -33,36 +33,40 @@ namespace Railtools.Interop.TrainPlayer
 			return result;
 		}
 
-		private IEnumerable<Section> CreateSections(TrainPlayerPart part) => part.Type switch
+		private IEnumerable<Section> CreateSections(TrainPlayerPart part)
 		{
-			"Curve" => new[] { CreateCurve(part) }, 
-			"Straight" => new [] { CreateStraight(part) },
-			_ => Array.Empty<Section>()
+			return new[]
+			{
+				new Section(part.Drawings.Select(p => CreateTrajectory(p)))
+			};
+		}
+
+		private ITrajectory CreateTrajectory(TrainPlayerDrawing drawing) => drawing switch
+		{
+			TrainPlayerLine line => CreateLine(line),
+			TrainPlayerArc arc => CreateArc(arc),
+			_ => throw new NotImplementedException()
 		};
 
-		private Section CreateStraight(TrainPlayerPart part)
+		private Line CreateLine(TrainPlayerLine line)
 		{
-			var trajectory = CreateLine(part);
-			return new Section(trajectory);
+			return new Line(CoordsToVector3(line.Point1), CoordsToVector3(line.Point2));
 		}
 
-		private Section CreateCurve(TrainPlayerPart part)
-		{
-			return CreateCurve(part.Drawings.Cast<TrainPlayerArc>().Single());
-		}
-
-		private Section CreateCurve(TrainPlayerArc arc)
+		private ITrajectory CreateArc(TrainPlayerArc arc)
 		{
 			var start = CoordsToVector3(arc.Point1);
 			var end = CoordsToVector3(arc.Point2);
-			return new Section(CircularArc.Create(
+			return CircularArc.Create(
 				start,
 				MathUtil.DegreesToRadiansF(90 - arc.Direction),
 				end,
 				ToMMX(arc.Radius),
 				MathUtil.DegreesToRadiansF(arc.Angle)
-			));
+			);
 		}
+
+
 
 		private string RandomColor()
 		{
@@ -71,12 +75,7 @@ namespace Railtools.Interop.TrainPlayer
 
 		private Random random = new Random(19681);
 
-		private Line CreateLine(TrainPlayerPart part)
-		{
-			var from = _endpoints[part.EndpointNrs[0]];
-			var to = _endpoints[part.EndpointNrs[1]];
-			return new Line(CoordsToVector3(from.Coord), CoordsToVector3(to.Coord));
-		}
+
 
 		private Vector3 CoordsToVector3(string coords)
 		{
