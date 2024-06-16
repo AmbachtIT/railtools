@@ -30,13 +30,6 @@ namespace Railtools.Tracks.Layout
 
 		public ITrajectory Trajectory { get; }
 
-		public Rectangle<float> Bounds()
-		{
-			return RectangleUtil.Cover(new[]
-			{
-				Trajectory.StartPosition().ToVector2(),
-				Trajectory.EndPosition().ToVector2()
-			});
-		}
+		public Rectangle<float> Bounds() => Trajectory.Bounds();
 	}
 }

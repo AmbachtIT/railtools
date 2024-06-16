@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Ambacht.Common.Mathmatics;
 
 namespace Railtools.Geometry
 {
@@ -23,6 +24,8 @@ namespace Railtools.Geometry
 		/// <param name="position"></param>
 		/// <returns></returns>
 		float Project(Vector3 position);
+
+		Rectangle<float> Bounds();
 
 
 	}

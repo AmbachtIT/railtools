@@ -44,5 +44,10 @@ namespace Railtools.Geometry
 		{
 			throw new NotImplementedException();
 		}
+
+		public Rectangle<float> Bounds() => RectangleUtil.Cover(new[]
+		{
+			Start, End
+		}.Select(s => s.ToVector2()));
 	}
 }

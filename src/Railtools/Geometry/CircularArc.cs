@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -80,5 +81,11 @@ namespace Railtools.Geometry
 			var angle = delta.Angle();
 			return MathUtil.ReverseLerp(StartAngle, EndAngle, angle);
 		}
+
+
+		public Rectangle<float> Bounds() => RectangleUtil.Cover(new[]
+		{
+			StartPosition(), EndPosition()
+		}.Select(s => s.ToVector2()));
 	}
 }
