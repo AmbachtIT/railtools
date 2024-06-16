@@ -49,6 +49,21 @@ namespace Railtools.Interop.TrainPlayer
 		private Section CreateCurve(TrainPlayerPart part)
 		{
 			var arc = part.Drawings.Cast<TrainPlayerArc>().Single();
+			var startPoint = _endpoints[part.EndpointNrs[0]];
+			var endPoint = _endpoints[part.EndpointNrs[1]];
+			return new Section(CircularArc.Create(
+				CoordsToVector3(startPoint.Coord),
+				MathUtil.DegreesToRadiansF(90 - startPoint.Direction),
+				CoordsToVector3(endPoint.Coord),
+				ToMMX(arc.Radius),
+				MathUtil.DegreesToRadiansF(arc.Angle)
+			));
+		}
+
+
+		private Section CreateCurve2(TrainPlayerPart part)
+		{
+			var arc = part.Drawings.Cast<TrainPlayerArc>().Single();
 			var start = _endpoints[part.EndpointNrs[0]];
 			var startPosition = CoordsToVector3(start.Coord);
 			var startDirection = MathUtil.UnitFromAngle(MathUtil.DegreesToRadiansF(90 - start.Direction));

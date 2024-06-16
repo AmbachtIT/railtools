@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Mathmatics;
+using Railtools.Interop.TrainPlayer;
 
 
 namespace Railtools.Geometry
@@ -87,5 +88,43 @@ namespace Railtools.Geometry
 		{
 			StartPosition(), EndPosition()
 		}.Select(s => s.ToVector2()));
+
+
+		public static CircularArc Create(Vector3 start, float startAngle, Vector3 end, float radius, float angle)
+		{
+			var startDirection = MathUtil.UnitFromAngle(startAngle);
+			return CreateCandidates(start, end, radius, angle)
+				.MaxBy(arc =>
+				{
+ 					var t = arc.Project(start);
+					var actualDirection = MathUtil.UnitFromAngle(arc.GetPointWithDirection(t).Direction);
+					return Math.Abs(Vector2.Dot(startDirection, actualDirection));
+				})!;
+		}
+
+		private static IEnumerable<CircularArc> CreateCandidates(Vector3 start, Vector3 end, float radius, float angle)
+		{
+			var line = new Line(start, end);
+
+			var d = line.Length() / 2f;
+			var l = MathF.Sqrt(radius * radius - d * d);
+
+
+			foreach (var dir in new[] { 1, -1 })
+			{
+				var pi = dir * MathF.PI / 2;
+
+
+				var c1 = line.GetPointWithDirection(0).Right(l * dir).Forward(d);
+				var halfAngle = angle / 2;
+
+				var a1 = c1.Direction + pi - halfAngle;
+				var a2 = c1.Direction + pi + halfAngle;
+
+				yield return new CircularArc(c1.Point.ToVector2(), radius, a1, a2, line.Start.Z, line.End.Z);
+			}
+
+		}
+
 	}
 }
