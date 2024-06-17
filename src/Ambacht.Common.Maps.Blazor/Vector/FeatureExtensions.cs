@@ -16,7 +16,7 @@ namespace Ambacht.Common.Maps.Blazor.Vector
 
 		public static Accessor<string> Stroke(this IFeature feature) => feature.Accessor<string>("stroke");
 
-		public static Accessor<string> StrokeWidth(this IFeature feature) => feature.Accessor<string>("stroke-width");
+		public static Accessor<float> StrokeWidth(this IFeature feature) => feature.Accessor<float>("stroke-width");
 
 		public static Accessor<int> ZIndex(this IFeature feature) => feature.Accessor<int>("z-index");
 

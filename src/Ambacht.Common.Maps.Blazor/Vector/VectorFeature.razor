@@ -1,10 +1,30 @@
 ﻿@using NetTopologySuite.Features
 <VectorGeometry 
 	Value="@Value.Geometry" 
-	Fill="@(Value.Fill().Get() ?? "none")"
-	Stroke="@(Value.Stroke().Get() ?? "none")" />
+	Fill="@Fill"
+	Stroke="@Stroke"
+	StrokeWidth="@StrokeWidth" />
 
 @code {
 	[Parameter()]
-	public IFeature Value { get; set; }
+	public IFeature Value { get; set; } 
+	
+	private string Fill => Value.Fill().Get() ?? "none";
+	private string Stroke => Value.Stroke().Get() ?? "none";
+
+	private float StrokeWidth
+	{
+		get
+		{
+			var result = Value.StrokeWidth().Get();
+			if (result == 0)
+			{
+				return 1;
+			}
+
+			return result;
+		}
+	}
+
 }
+

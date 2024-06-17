@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ambacht.Common.Maps.Blazor.Vector;
+using Ambacht.Common.Maps.Nts;
 using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Operation.Buffer;
 using Railtools.Geometry;
 using Railtools.Tracks.Layouts;
 
@@ -16,10 +19,33 @@ namespace Railtools.Interop.Lasercut
 		public FeatureCollection Render()
 		{
 			var result = new FeatureCollection();
+			result.Add(RenderRailSupports());
 			foreach (var section in layout.Sections)
 			{
 				Render(result, section);
 			}
+			return result;
+		}
+
+		private IFeature RenderRailSupports()
+		{
+			var polygons = new List<NetTopologySuite.Geometries.Geometry>();
+			foreach (var section in layout.Sections)
+			{
+				foreach (var trajectory in section.Trajectories)
+				{
+					var ring = (LinearRing) trajectory.Buffer(60);
+					polygons.Add(new Polygon(ring).Buffer(1, EndCapStyle.Square));
+				}
+			}
+
+			var union = polygons.RobustUnion();
+			var result = new Feature()
+			{
+				Geometry = union
+			};
+			result.Stroke().Set("#00ff00");
+			result.StrokeWidth().Set(0.5f);
 			return result;
 		}
 
@@ -58,6 +84,7 @@ namespace Railtools.Interop.Lasercut
 				Geometry = geometry
 			};
 			result.Stroke().Set(stroke);
+			result.StrokeWidth().Set(0.1f);
 			return result;
 		}
 
