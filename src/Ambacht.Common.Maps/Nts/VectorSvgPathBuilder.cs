@@ -31,8 +31,6 @@ namespace Ambacht.Common.Maps.Nts
 		{
 			var builder = new StringBuilder();
 			builder.Append(VisitLineString(polygon.ExteriorRing));
-			return builder.ToString();
-
 			foreach (var inner in polygon.InteriorRings)
 			{
 				builder.Append(" ");
