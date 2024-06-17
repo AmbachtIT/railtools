@@ -301,56 +301,12 @@ namespace Ambacht.Common.Maps.Nts
 
 		public static string GetSvgPath(this Geometry geometry, VectorMapView view)
 		{
-			return geometry switch
-			{
-				Point point => point.GetSvgPath(view),
-				LineString line => line.GetSvgPath(view),
-				NetTopologySuite.Geometries.Polygon poly => poly.GetSvgPath(view),
-				GeometryCollection coll => string.Join(" ",
-					coll.Geometries.Select(g => g.GetSvgPath(view))),
-				_ => throw new InvalidOperationException()
-			};
+			return new VectorSvgPathBuilder(view).VisitGeometry(geometry);
 		}
 
-		public static string GetSvgPath(this NetTopologySuite.Geometries.Polygon polygon, VectorMapView view)
-		{
-			return polygon?.ExteriorRing?.GetSvgPath(view);
-		}
-
-		public static string GetSvgPath(this LineString line, VectorMapView view) => line.Coordinates.GetSvgPath(view);
 
 
-		public static string GetSvgPath(this Coordinate[] coords, VectorMapView view)
-		{
-			var builder = new StringBuilder();
-
-			foreach (var coord in coords)
-			{
-				if (builder.Length == 0)
-				{
-					builder.Append("M");
-				}
-				else
-				{
-					builder.Append(" L");
-				}
-
-				builder.Append(' ');
-				builder.Write(view.WorldToScreen(coord));
-			}
-
-			return builder.ToString();
-		}
-
-		public static string GetSvgPath(this Point point, VectorMapView view)
-		{
-			var builder = new StringBuilder();
-			builder.Append("M");
-			builder.Write(view.WorldToScreen(point.Coordinate));
-			return builder.ToString();
-		}
-
-		public static void Write(this StringBuilder builder, Vector2 pos)
+		public static void WriteSvgCoordinate(this StringBuilder builder, Vector2 pos)
 		{
 			builder.Append(pos.X.ToString(_neutral));
 			builder.Append(" ");
