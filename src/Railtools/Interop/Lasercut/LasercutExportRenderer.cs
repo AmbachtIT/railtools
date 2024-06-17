@@ -16,10 +16,14 @@ namespace Railtools.Interop.Lasercut
 	public class LasercutExportRenderer(Layout layout)
 	{
 
+
+		public Predicate<Section> IncludeRoadBed { get; set; } = s => s.Trajectories.Any(t => t.VerticalBounds().Max < 100);
+
 		public FeatureCollection Render()
 		{
 			var result = new FeatureCollection();
-			result.Add(RenderRailSupports());
+			var basePlates = RenderRailBasePlates();
+			result.Add(basePlates);
 			foreach (var section in layout.Sections)
 			{
 				Render(result, section);
@@ -27,10 +31,10 @@ namespace Railtools.Interop.Lasercut
 			return result;
 		}
 
-		private IFeature RenderRailSupports()
+		private IFeature RenderRailBasePlates()
 		{
 			var polygons = new List<NetTopologySuite.Geometries.Geometry>();
-			foreach (var section in layout.Sections)
+			foreach (var section in layout.Sections.Where(s => IncludeRoadBed(s)))
 			{
 				foreach (var trajectory in section.Trajectories)
 				{

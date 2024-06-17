@@ -37,26 +37,26 @@ namespace Railtools.Interop.TrainPlayer
 		{
 			return new[]
 			{
-				new Section(part.Drawings.Select(p => CreateTrajectory(p)))
+				new Section(part.Drawings.Select(drawing => CreateTrajectory(part, drawing)))
 			};
 		}
 
-		private ITrajectory CreateTrajectory(TrainPlayerDrawing drawing) => drawing switch
+		private ITrajectory CreateTrajectory(TrainPlayerPart part, TrainPlayerDrawing drawing) => drawing switch
 		{
-			TrainPlayerLine line => CreateLine(line),
-			TrainPlayerArc arc => CreateArc(arc),
+			TrainPlayerLine line => CreateLine(part, line),
+			TrainPlayerArc arc => CreateArc(part, arc),
 			_ => throw new NotImplementedException()
 		};
 
-		private Line CreateLine(TrainPlayerLine line)
+		private Line CreateLine(TrainPlayerPart part, TrainPlayerLine line)
 		{
-			return new Line(CoordsToVector3(line.Point1), CoordsToVector3(line.Point2));
+			return new Line(CoordsToVector3(part, line.Point1), CoordsToVector3(part, line.Point2));
 		}
 
-		private ITrajectory CreateArc(TrainPlayerArc arc)
+		private ITrajectory CreateArc(TrainPlayerPart part, TrainPlayerArc arc)
 		{
-			var start = CoordsToVector3(arc.Point1);
-			var end = CoordsToVector3(arc.Point2);
+			var start = CoordsToVector3(part, arc.Point1);
+			var end = CoordsToVector3(part, arc.Point2);
 			return CircularArc.Create(
 				start,
 				MathUtil.DegreesToRadiansF(90 - arc.Direction),
@@ -76,6 +76,15 @@ namespace Railtools.Interop.TrainPlayer
 		private Random random = new Random(19681);
 
 
+		private Vector3 CoordsToVector3(TrainPlayerPart part, string coords)
+		{
+			var result = CoordsToVector3(coords);
+			return result with
+			{
+				Z = GetNearestHeight(part, result.X, result.Y)
+			};
+		}
+
 
 		private Vector3 CoordsToVector3(string coords)
 		{
@@ -87,11 +96,20 @@ namespace Railtools.Interop.TrainPlayer
 
 			var x = float.Parse(parts[0]);
 			var y = float.Parse(parts[1]);
-			var z = parts.Length > 2 ? float.Parse(parts[2]) : 0f;
+			var z = parts.Length > 2 ? float.Parse(parts[2]) : 0;
 			return new Vector3(
 				(float)Math.Round(ToMMX(x), 1), 
 				(float)Math.Round(ToMMY(y), 1),
 				(float)Math.Round(ToMMX(z * 4.02204f), 1));
+		}
+
+		private float GetNearestHeight(TrainPlayerPart part, float x, float y)
+		{
+			return part
+				.EndpointNrs
+				.Select(nr => CoordsToVector3(_endpoints[nr].Coord))
+				.MinBy(v => Vector2.Distance(v.ToVector2(), new(x, y)))
+				.Z;
 		}
 
 		private float ToMMX(float value) => value * layout.ScaleX * 10;

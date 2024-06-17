@@ -49,5 +49,7 @@ namespace Railtools.Geometry
 		{
 			Start, End
 		}.Select(s => s.ToVector2()));
+
+		public Range<float> VerticalBounds() => new Range<float>(Start.Z, End.Z);
 	}
 }

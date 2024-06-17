@@ -89,6 +89,7 @@ namespace Railtools.Geometry
 			StartPosition(), EndPosition()
 		}.Select(s => s.ToVector2()));
 
+		public Range<float> VerticalBounds() => new Range<float>(StartHeight, EndHeight);
 
 		public static CircularArc Create(Vector3 start, float startAngle, Vector3 end, float radius, float angle)
 		{

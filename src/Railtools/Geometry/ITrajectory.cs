@@ -27,6 +27,8 @@ namespace Railtools.Geometry
 
 		Rectangle<float> Bounds();
 
+		Range<float> VerticalBounds();
+
 
 	}
 
