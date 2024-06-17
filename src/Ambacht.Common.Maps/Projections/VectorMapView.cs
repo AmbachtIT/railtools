@@ -17,7 +17,7 @@ namespace Ambacht.Common.Maps.Projections
 		/// <summary>
 		/// Location the map is centered on, in world coordinates
 		/// </summary>
-		public Vector2 Center { get; set; }
+		public Vector2<double> Center { get; set; }
 
 		/// <summary>
 		/// Size of the viewport in pixels
@@ -29,15 +29,15 @@ namespace Ambacht.Common.Maps.Projections
 		/// <summary>
 		/// Scale, in pixels per unit
 		/// </summary>
-		public float Scale { get; set; }
+		public double Scale { get; set; }
 
 		public Vector2 WorldToScreen(Coordinate coord)
 		{
-			var result = coord.ToVector2F();
+			var result = coord.ToVector2();
 			result -= Center;
 			result *= Scale;
-			result += HalfSize;
-			return result;
+			result += HalfSize.ToVector2D();
+			return result.Cast<float>().ToVector2();
 		}
 
 
@@ -45,11 +45,11 @@ namespace Ambacht.Common.Maps.Projections
 		{
 			return this with
 			{
-				Center = Center - deltaPixels / Scale
+				Center = Center - new Vector2<double>(deltaPixels.X / Scale, deltaPixels.Y / Scale)
 			};
 		}
 
-		public VectorMapView Fit(Rectangle<float> bounds)
+		public VectorMapView Fit(Rectangle<double> bounds)
 		{
 			if (bounds.Width <= 0 || bounds.Height <= 0)
 			{
@@ -60,7 +60,7 @@ namespace Ambacht.Common.Maps.Projections
 			var scale = Math.Min(scaleX, scaleY);
 			return this with
 			{
-				Center = bounds.Center().ToVector2(),
+				Center = bounds.Center(),
 				Scale = Math.Min(scaleX, scaleY)
 			};
 		}

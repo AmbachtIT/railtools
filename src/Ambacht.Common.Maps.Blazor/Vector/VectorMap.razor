@@ -53,8 +53,8 @@
 	private ElementReference _container;
 	private VectorMapView _view = new ()
 	{
-		Size = new Vector2(600, 600),
-		Center = new Vector2(300, 300),
+		Size = new (600, 600),
+		Center = new (300, 300),
 		Scale = 1
 	};
 
@@ -231,7 +231,7 @@
 
 	#region Fit
 
-	public async Task Fit(Rectangle<float> bounds, bool keepTracking)
+	public async Task Fit(Rectangle<double> bounds, bool keepTracking)
 	{
 		if (keepTracking)
 		{
@@ -247,8 +247,8 @@
 		await SetView(_view.Fit(bounds));
 	}
 
-	private Rectangle<float>? _deferredFit = null;
-	private Rectangle<float>? _trackedFit = null;
+	private Rectangle<double>? _deferredFit = null;
+	private Rectangle<double>? _trackedFit = null;
 
 	#endregion
 

@@ -110,7 +110,7 @@
 		{
 			var newView = View with
 			{
-				Center = _center?.ToVector2F() ?? default
+				Center = _center?.ToVector2() ?? default
 			};
 			_cachedSvgPath = Value.GetSvgPath(newView);
 		}
