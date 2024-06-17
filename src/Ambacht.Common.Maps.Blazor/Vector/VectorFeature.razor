@@ -1,0 +1,10 @@
+﻿@using NetTopologySuite.Features
+<VectorGeometry 
+	Value="@Value.Geometry" 
+	Fill="@(Value.Fill().Get() ?? "none")"
+	Stroke="@(Value.Stroke().Get() ?? "none")" />
+
+@code {
+	[Parameter()]
+	public IFeature Value { get; set; }
+}

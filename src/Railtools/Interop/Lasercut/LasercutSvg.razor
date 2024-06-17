@@ -1,11 +1,9 @@
-﻿@using Railtools.Tracks.Layouts
+﻿@using NetTopologySuite.Features
+@using Railtools.Tracks.Layouts
 @preservewhitespace true 
 <VectorMap @ref="@_map" FixedSize="new Vector2(1000, 1000)">
 	<desc>Line engraving</desc>
-	@foreach (var sect in Layout.Sections)
-	{
-		<TrackSectionLines Value="@sect"/>
-	}
+	<VectorFeatureCollection Value="@GetFeatureCollection()" />
 </VectorMap>
 
 @code {
@@ -23,5 +21,17 @@
 	}
 
 	private VectorMap _map;
+
+	private FeatureCollection GetFeatureCollection()
+	{
+		if (_rendered == null)
+		{
+			_rendered = new LasercutExportRenderer(Layout).Render();
+		}
+
+		return _rendered;
+	}
+
+	private FeatureCollection _rendered = null;
 
 }

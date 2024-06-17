@@ -1,0 +1,15 @@
+﻿@using NetTopologySuite.Features
+@if (Value != null)
+{
+	foreach (var feature in Value.OrderBy(f => f.ZIndex().Get()))
+	{
+		<VectorFeature Value="@feature" />
+	}
+}
+
+@code {
+
+	[Parameter()]
+	public FeatureCollection Value { get; set; }
+
+}
